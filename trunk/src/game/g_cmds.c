@@ -2686,28 +2686,35 @@ void Cmd_Class_f( gentity_t *ent )
     }
     else if( ent->client->pers.teamSelection == PTE_HUMANS )
     {
-      //set the item to spawn with
-      if( !Q_stricmp( s, BG_FindNameForWeapon( WP_MACHINEGUN ) ) &&
-          BG_WeaponIsAllowed( WP_MACHINEGUN ) )
-      {
-        ent->client->pers.humanItemSelection = WP_MACHINEGUN;
-      }
-      else if( !Q_stricmp( s, BG_FindNameForWeapon( WP_HBUILD ) ) &&
-               BG_WeaponIsAllowed( WP_HBUILD ) )
-      {
-        ent->client->pers.humanItemSelection = WP_HBUILD;
-      }
-      else if( !Q_stricmp( s, BG_FindNameForWeapon( WP_HBUILD2 ) ) &&
-               BG_WeaponIsAllowed( WP_HBUILD2 ) &&
-               BG_FindStagesForWeapon( WP_HBUILD2, g_humanStage.integer ) )
-      {
-        ent->client->pers.humanItemSelection = WP_HBUILD2;
+      if( g_cheats.integer ) {
+
+        //set the item to spawn with
+        if( !Q_stricmp( s, BG_FindNameForWeapon( WP_MACHINEGUN ) ) &&
+            BG_WeaponIsAllowed( WP_MACHINEGUN ) )
+        {
+          ent->client->pers.humanItemSelection = WP_MACHINEGUN;
+        }
+        else if( !Q_stricmp( s, BG_FindNameForWeapon( WP_HBUILD ) ) &&
+                 BG_WeaponIsAllowed( WP_HBUILD ) )
+        {
+          ent->client->pers.humanItemSelection = WP_HBUILD;
+        }
+        else if( !Q_stricmp( s, BG_FindNameForWeapon( WP_HBUILD2 ) ) &&
+                 BG_WeaponIsAllowed( WP_HBUILD2 ) &&
+                 BG_FindStagesForWeapon( WP_HBUILD2, g_humanStage.integer ) )
+        {
+          ent->client->pers.humanItemSelection = WP_HBUILD2;
+        }
+        else
+        {
+          trap_SendServerCommand( ent-g_entities,
+            "print \"Unknown starting item\n\"" );
+          return;
+        }
       }
       else
       {
-        trap_SendServerCommand( ent-g_entities,
-          "print \"Unknown starting item\n\"" );
-        return;
+        ent->client->pers.humanItemSelection = WP_MACHINEGUN;
       }
       // spawn from a telenode
       G_LogOnlyPrintf("ClientTeamClass: %i human %s\n", clientNum, s);
