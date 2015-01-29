@@ -1333,6 +1333,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
     if ( targ->flags & FL_GODMODE && !g_devmapNoGod.integer)
       return;
 
+    // HG invincibility
+    if( targ->s.eType != ET_BUILDABLE && !g_suddenDeath.integer )
+      return;
+
     if( level.paused )
       return;
     
