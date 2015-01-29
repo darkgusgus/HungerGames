@@ -300,7 +300,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
 
     {"slap", G_admin_slap, "slap",
       "Do damage to a player, and send them flying",
-      "[^3name|slot^7] (damage)"
+      "[^3name|slot^7] "
     },
 
     {"spec999", G_admin_spec999, "spec999",
@@ -6413,12 +6413,7 @@ qboolean G_admin_slap( gentity_t *ent, int skiparg )
     ADMP( "^3!slap: ^7sorry, you cannot slap yourself\n" );
     return qfalse;
   }
-  if( !admin_higher( ent, vic ) )
-  {
-    ADMP( "^3!slap: ^7sorry, but your intended victim has a higher admin"
-          " level than you\n" );
-    return qfalse;
-  }
+
   if( vic->client->pers.teamSelection == PTE_NONE ||
       vic->client->pers.classSelection == PCL_NONE )
   {
@@ -6436,39 +6431,6 @@ qboolean G_admin_slap( gentity_t *ent, int skiparg )
     va( "cp \"%s^7 is not amused\n\"",
         ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
 
-  if( g_slapDamage.integer > 0 )
-  {
-    int damage;
-
-    if( G_SayArgc() > 2 + skiparg )
-    {
-      char dmg_str[ MAX_STRING_CHARS ];
-      G_SayArgv( 2 + skiparg, dmg_str, sizeof( dmg_str ) );
-      damage = atoi(dmg_str);
-      if( damage < 0 ) damage = 0;
-    }
-    else
-    {
-      if( g_slapDamage.integer > 100 ) g_slapDamage.integer = 100;
-      damage = BG_FindHealthForClass( vic->client->ps.stats[ STAT_PCLASS ] ) *
-        g_slapDamage.integer / 100;
-      if( damage < 1 ) damage = 1;
-    }
-
-    vic->health -= damage;
-    vic->client->ps.stats[ STAT_HEALTH ] = vic->health;
-    vic->lastDamageTime = level.time;
-    if( vic->health <= 0 )
-    {
-      vic->flags |= FL_NO_KNOCKBACK;
-      vic->enemy = &g_entities[ pids[ 0 ] ];
-      vic->die( vic, ent, ent, damage, MOD_SLAP );
-    }
-    else if( vic->pain )
-    {
-      vic->pain( vic, &g_entities[ pids[ 0 ] ], damage );
-    }
-  }
   return qtrue;
 }
 
