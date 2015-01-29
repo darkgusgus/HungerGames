@@ -801,7 +801,7 @@ void Cmd_Team_f( gentity_t *ent )
       return;
     }
 
-    if( level.alienTeamLocked && !force )
+    if( ( level.alienTeamLocked || g_suddenDeath.integer ) && !force )
     {
       trap_SendServerCommand( ent-g_entities,
         va( "print \"Alien team has been ^1LOCKED\n\"" ) );
@@ -831,7 +831,7 @@ void Cmd_Team_f( gentity_t *ent )
       return;
     }
 
-    if( level.humanTeamLocked && !force )
+    if( ( level.humanTeamLocked || g_suddenDeath.integer ) && !force )
     {
       trap_SendServerCommand( ent-g_entities,
         va( "print \"Human team has been ^1LOCKED\n\"" ) );
@@ -854,7 +854,7 @@ void Cmd_Team_f( gentity_t *ent )
   }
   else if( !Q_stricmp( s, "auto" ) )
   {
-    if( level.humanTeamLocked && level.alienTeamLocked )
+    if( g_suddenDeath.integer || ( level.humanTeamLocked && level.alienTeamLocked ) )
       team = PTE_NONE;
     else if( humans > aliens )
       team = PTE_ALIENS;

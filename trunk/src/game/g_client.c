@@ -835,6 +835,9 @@ void SpawnCorpse( gentity_t *ent )
 
   VectorCopy ( body->s.pos.trBase, body->r.currentOrigin );
   trap_LinkEntity( body );
+
+  // HG Death
+  G_ChangeTeam( ent, PTE_NONE );
 }
 
 //======================================================================
