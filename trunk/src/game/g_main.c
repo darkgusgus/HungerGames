@@ -1329,6 +1329,18 @@ void G_CalculateBuildPoints( void )
         localHTP = 0;
         localATP = 0;
 
+        // Removes all players that haven't spawned
+        for( i = 0; i < MAX_CLIENTS; i++ )
+        {
+          ent = &g_entities[ i ];
+          if(!ent->client || 
+            ent->client->pers.connected != CON_CONNECTED ||
+            ent->client->pers.teamSelection != PTE_HUMANS ||
+            ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+            continue;
+          G_ChangeTeam(ent, PTE_NONE);
+        }
+
         if( g_suddenDeathMode.integer == SDMODE_SELECTIVE )
         {
           for( i = 1, ent = g_entities + i; i < level.num_entities; i++, ent++ )
