@@ -238,6 +238,19 @@ vmCvar_t  g_aimbotAdvertBanReason;
 vmCvar_t  hg_stage2AdvanceTime;
 vmCvar_t  hg_stage3AdvanceTime;
 
+vmCvar_t  g_tipTime;
+vmCvar_t  g_tipFile;
+vmCvar_t  g_tipPrepend;
+
+
+// Hunger Games
+// Keep these local since they won't be used elsewhere?
+// Another idea is to store in level_locals_t
+int       lastTipTime;
+int       tipIndex;
+char      tipCache[HG_MAX_TIP_COUNT][HG_MAX_TIP_LENGTH + 1];
+int       tipCacheSize;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -451,7 +464,11 @@ static cvarTable_t   gameCvarTable[ ] =
 
   // Hunger Games CVars
   { &hg_stage2AdvanceTime, "hg_stage2AdvanceTime", "3", CVAR_ARCHIVE, 0, qfalse },
-  { &hg_stage3AdvanceTime, "hg_stage3AdvanceTime", "5", CVAR_ARCHIVE, 0, qfalse }
+  { &hg_stage3AdvanceTime, "hg_stage3AdvanceTime", "5", CVAR_ARCHIVE, 0, qfalse },
+
+  { &g_tipTime, "g_tipTime", "15", CVAR_ARCHIVE, 0, qfalse },
+  { &g_tipFile, "g_tipFile", "info/tips.txt", CVAR_ARCHIVE, 0, qfalse },
+  { &g_tipPrepend, "g_tipPrepend", "^3Tip: ", CVAR_ARCHIVE, 0, qfalse }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
@@ -464,6 +481,10 @@ void CheckExitRules( void );
 
 void G_CountSpawns( void );
 void G_CalculateBuildPoints( void );
+
+// Hunger Games
+void G_InitTips( void );
+void G_ShowTips( void );
 
 /*
 ================
@@ -3038,6 +3059,9 @@ void G_RunFrame( int levelTime )
   // for tracking changes
   CheckCvars( );
 
+  // Hunger Games Tips Additions
+  G_ShowTips( );
+
   if( g_listEntity.integer )
   {
     for( i = 0; i < MAX_GENTITIES; i++ )
@@ -3047,3 +3071,94 @@ void G_RunFrame( int levelTime )
   }
 }
 
+void G_InitTips( void )
+{
+  int length, i, j;
+  fileHandle_t infoFile;
+  char message[ MAX_STRING_CHARS ], *cr;
+
+  lastTipTime = level.startTime;
+  tipIndex = 0;
+  tipCacheSize = 0;
+
+  // Most of this pulled from !info
+
+  length = trap_FS_FOpenFile( g_tipFile.string, &infoFile, FS_READ );
+
+  G_LogPrintf( "Initializing Tip File \"%s\"\n", g_tipFile.string );
+
+  if( length < 0 || !infoFile )
+  {
+    G_LogPrintf( "WARNING: Tip File \"%s\" does not exist!\n", g_tipFile.string );
+    return;
+  }
+  if( length == 0 )
+  {
+    G_LogPrintf( "WARNING: Tip File \"%s\" contains no tips!\n", g_tipFile.string );
+    return;
+  }
+  
+  // Read from file
+  trap_FS_Read( message, sizeof( message ), infoFile );
+
+  if( length < sizeof( message ) )
+    message[ length ] = '\0';
+  else
+    message[ sizeof( message ) - 1 ] = '\0';
+  
+  trap_FS_FCloseFile( infoFile );
+
+  // Strip \r's
+  while( ( cr = strchr( message, '\r' ) ) )
+    memmove( cr, cr + 1, strlen( cr + 1 ) + 1 );
+
+  i = 0;
+  j = 0;
+  for(cr = message; *cr && cr - message < length; cr++, j++)
+  {
+    if(*cr == '\n' || j >= HG_MAX_TIP_LENGTH)
+    {
+      if(j >= HG_MAX_TIP_LENGTH)
+      {
+        G_LogPrintf("WARNING: Tip \"%s\" exceeds maximum tip length.\n", tipCache[i]);
+        while(*cr != '\n' && *cr != '\0')
+          cr++;
+        if(!*cr)
+          break;
+      }
+
+      if( ++i >= HG_MAX_TIP_COUNT )
+      {
+        G_LogPrintf("WARNING: Tip File \"%s\" exceeds maximum tip count.\n", g_tipFile.string);
+        break;
+      }
+      else
+      {
+        tipCache[i][j] = '\0'; // null terminate
+        j = -1; // j++ in for loop
+        continue;
+      }
+    }
+    tipCache[i][j] = *cr;
+  }
+  tipCacheSize = i;
+}
+
+/*
+================
+G_ShowTips
+
+Part of Hunger Games
+Shows a tip every g_tipTime
+================
+*/
+void G_ShowTips( void )
+{
+  if(tipCacheSize <= 0 || (level.time - lastTipTime) < g_tipTime.integer * 1000)
+    return;
+  if(tipIndex >= tipCacheSize)
+    tipIndex = 0;
+  trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[tipIndex] ) );
+  lastTipTime = level.time;
+  tipIndex++;
+}
