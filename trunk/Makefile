@@ -141,13 +141,13 @@ VERSION=$(shell grep "\#define VERSION_NUMBER" $(CMDIR)/q_shared.h | \
   sed -e 's/[^"]*"\(.*\)"/\1/')
 
 USE_SVN=
-#ifeq ($(wildcard .svn),.svn)
-#  SVN_REV=$(shell LANG=C svnversion .)
-#  ifneq ($(SVN_REV),)
-#    SVN_VERSION=$(VERSION)_SVN$(SVN_REV)
-#    USE_SVN=1
-#  endif
-#endif
+ifeq ($(wildcard .svn),.svn)
+  SVN_REV=$(shell LANG=C svnversion .)
+  ifneq ($(SVN_REV),)
+    SVN_VERSION=$(VERSION)_SVN$(SVN_REV)
+    USE_SVN=1
+  endif
+endif
 ifneq ($(USE_SVN),1)
     SVN_VERSION=$(VERSION)
 endif
@@ -699,14 +699,16 @@ TARGETS =
 ifneq ($(BUILD_GAME_SO),0)
   TARGETS += \
     $(B)/base/cgame$(ARCH).$(SHLIBEXT) \
-    $(B)/base/game$(ARCH).$(SHLIBEXT) 
+    $(B)/base/game$(ARCH).$(SHLIBEXT) \
+    $(B)/base/ui$(ARCH).$(SHLIBEXT)
 endif
 
 ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
     TARGETS += \
       $(B)/base/vm/cgame.qvm \
-      $(B)/base/vm/game.qvm
+      $(B)/base/vm/game.qvm \
+      $(B)/base/vm/ui.qvm
   endif
 endif
 
@@ -930,6 +932,35 @@ $(B)/base/game$(ARCH).$(SHLIBEXT) : $(GOBJ)
 $(B)/base/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm
 	@echo "Q3ASM $@"
 	@$(Q3ASM) -o $@ $(GVMOBJ) $(GDIR)/g_syscalls.asm
+
+
+
+#############################################################################
+## TREMULOUS UI
+#############################################################################
+
+UIOBJ_ = \
+  $(B)/base/ui/ui_main.o \
+  $(B)/base/ui/ui_atoms.o \
+  $(B)/base/ui/ui_players.o \
+  $(B)/base/ui/ui_shared.o \
+  $(B)/base/ui/ui_gameinfo.o \
+  \
+  $(B)/base/game/bg_misc.o \
+  $(B)/base/qcommon/q_math.o \
+  $(B)/base/qcommon/q_shared.o
+
+UIOBJ = $(UIOBJ_) $(B)/base/ui/ui_syscalls.o
+UIVMOBJ = $(UIOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
+
+$(B)/base/ui$(ARCH).$(SHLIBEXT) : $(UIOBJ)
+	@echo "LD $@"
+	@$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
+
+$(B)/base/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
+	@echo "Q3ASM $@"
+	@$(Q3ASM) -o $@ $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
+
 
 
 #############################################################################
