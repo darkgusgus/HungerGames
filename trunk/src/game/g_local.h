@@ -1485,6 +1485,10 @@ extern  vmCvar_t  g_aimbotAdvertBan;
 extern  vmCvar_t  g_aimbotAdvertBanTime;
 extern  vmCvar_t  g_aimbotAdvertBanReason;
 
+// Hunger Games CVars
+extern  vmCvar_t  hg_stage2AdvanceTime;
+extern  vmCvar_t  hg_stage3AdvanceTime;
+
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
 int       trap_Milliseconds( void );

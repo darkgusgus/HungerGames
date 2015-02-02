@@ -234,6 +234,10 @@ vmCvar_t  g_aimbotAdvertBan;
 vmCvar_t  g_aimbotAdvertBanTime;
 vmCvar_t  g_aimbotAdvertBanReason;
 
+//Hunger Games CVars
+vmCvar_t  hg_stage2AdvanceTime;
+vmCvar_t  hg_stage3AdvanceTime;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -443,7 +447,11 @@ static cvarTable_t   gameCvarTable[ ] =
 
   { &g_aimbotAdvertBan, "g_aimbotAdvertBan", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_aimbotAdvertBanTime, "g_aimbotAdvertBanTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  }
+  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
+
+  // Hunger Games CVars
+  { &hg_stage2AdvanceTime, "hg_stage2AdvanceTime", "3", CVAR_ARCHIVE, 0, qfalse },
+  { &hg_stage3AdvanceTime, "hg_stage3AdvanceTime", "5", CVAR_ARCHIVE, 0, qfalse }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
@@ -1522,6 +1530,7 @@ void G_CalculateStages( void )
     G_LogPrintf("Stage: A 3: Aliens reached Stage 3\n");
   }
 
+/*
   if( g_humanKills.integer >=
       (int)( ceil( (float)g_humanStage2Threshold.integer * humanPlayerCountMod ) ) &&
       g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 )
@@ -1539,6 +1548,26 @@ void G_CalculateStages( void )
     trap_Cvar_Set( "g_humanStage", va( "%d", S3 ) );
     level.humanStage3Time = level.time;
     G_LogPrintf("Stage: H 3: Humans reached Stage 3\n");
+    lastHumanStageModCount = g_humanStage.modificationCount;
+  }
+*/
+  // Update stage every specified time
+  // Normal stage update for aliens since they are not part of the game
+  if( (level.time - level.startTime) >= (hg_stage2AdvanceTime.integer * 60000 ) &&
+    g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 )
+  {
+    trap_Cvar_Set( "g_humanStage", va( "%d", S2 ) );
+    level.humanStage2Time = level.time;
+    lastHumanStageModCount = g_humanStage.modificationCount;
+    G_LogPrintf(va("Stage: H 2: Humans reached Stage 2 at time %d\n", (level.time - level.startTime) / 60000));
+  }
+
+  if( (level.time - level.startTime) >= (hg_stage3AdvanceTime.integer * 60000 ) &&
+    g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 )
+  {
+    trap_Cvar_Set( "g_humanStage", va( "%d", S3 ) );
+    level.humanStage3Time = level.time;
+    G_LogPrintf(va("Stage: H 3: Humans reached Stage 3 at time %d\n", (level.time - level.startTime) / 60000));
     lastHumanStageModCount = g_humanStage.modificationCount;
   }
  
