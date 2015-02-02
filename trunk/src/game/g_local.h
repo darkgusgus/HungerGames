@@ -53,6 +53,10 @@ typedef struct gclient_s gclient_t;
 #define FL_NO_HUMANS      0x00004000  // spawn point just for bots
 #define FL_FORCE_GESTURE  0x00008000  // spawn point just for bots
 
+// Hunger Games
+#define HG_MAX_TIP_LENGTH 150 // MAX_SAY_TEXT
+#define HG_MAX_TIP_COUNT 32
+
 typedef struct
 {
   qboolean	isNB;
@@ -1488,6 +1492,13 @@ extern  vmCvar_t  g_aimbotAdvertBanReason;
 // Hunger Games CVars
 extern  vmCvar_t  hg_stage2AdvanceTime;
 extern  vmCvar_t  hg_stage3AdvanceTime;
+
+extern  vmCvar_t  g_tipTime;
+extern  vmCvar_t  g_tipFile;
+extern  vmCvar_t  g_tipPrepend;
+
+extern  char      tipCache[HG_MAX_TIP_COUNT][HG_MAX_TIP_LENGTH + 1];
+extern  int       tipCacheSize;
 
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
