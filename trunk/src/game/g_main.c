@@ -3085,11 +3085,16 @@ void G_InitTips( void )
 
   length = trap_FS_FOpenFile( g_tipFile.string, &infoFile, FS_READ );
 
-  G_LogPrintf(va("Initializing Tip File \"%s\"\n", g_tipFile.string));
+  G_LogPrintf( "Initializing Tip File \"%s\"\n", g_tipFile.string );
 
-  if( length <= 0 || !infoFile )
+  if( length < 0 || !infoFile )
   {
-    G_LogPrintf(va("WARNING: Tip File \"%s\" does not exist!\n", g_tipFile.string));
+    G_LogPrintf( "WARNING: Tip File \"%s\" does not exist!\n", g_tipFile.string );
+    return;
+  }
+  if( length == 0 )
+  {
+    G_LogPrintf( "WARNING: Tip File \"%s\" contains no tips!\n", g_tipFile.string );
     return;
   }
   
