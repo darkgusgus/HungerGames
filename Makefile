@@ -1042,13 +1042,47 @@ dist:
 #############################################################################
 # PK3s
 #############################################################################
-$(B)/$(MODPATH)/zui.$(PK3EXT):
-	@echo "QZIP $@"
-	-	@echo `git diff --name-only cd4da82 ui|sed s/trunk\\\\///` | xargs zip $@
 
-$(B)/$(MODPATH)/zvms.$(PK3EXT):
-	@echo "QZIP $@"
-	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/cgame.$(QVMEXT) vm/ui.$(QVMEXT)
+UIFILES_ = \
+  ui/assets/ \
+  ui/assets/alien/ \
+  ui/assets/alien/buildstat/ \
+  ui/assets/alien/buildstat/frame.tga \
+  ui/assets/alien/buildstat/mark.tga \
+  ui/assets/alien/buildstat/nopower.tga \
+  ui/assets/alien/buildstat/overlay.tga \
+  ui/assets/alien/buildstat.cfg \
+  ui/assets/human/ \
+  ui/assets/human/buildstat/ \
+  ui/assets/human/buildstat/frame.tga \
+  ui/assets/human/buildstat/mark.tga \
+  ui/assets/human/buildstat/nopower.tga \
+  ui/assets/human/buildstat.cfg \
+  ui/drop.menu \
+  ui/ingame.menu \
+  ui/ingame.txt \
+  ui/ingame_game.menu \
+  ui/ingame_options.menu \
+  ui/joinserver.menu \
+  ui/main.menu \
+  ui/menudef.h \
+  ui/menus.txt \
+  ui/options.menu \
+  ui/quitcredit.menu \
+  ui/teamscore.menu \
+  ui/tremulous_alien_builder_hud.menu \
+  ui/tremulous_alien_general_hud.menu \
+  ui/tremulous_default_hud.menu \
+  ui/tremulous_human_hud.menu \
+  $(shell git diff --name-only cd4da82 ui)
+
+$(B)/$(MODPATH)/zui.$(PK3EXT): $(UIFILES_)
+	@echo "ZIP $@"
+	@zip -X9 $@ $?
+
+$(B)/$(MODPATH)/zvms.$(PK3EXT): $(B)/$(MODPATH)/vm/cgame.$(QVMEXT) $(B)/$(MODPATH)/vm/ui.$(QVMEXT)
+	@echo "ZIP $@"
+	@cd $(B)/$(MODPATH); zip -X9 zvms.$(PK3EXT) vm/cgame.$(QVMEXT) vm/ui.$(QVMEXT)
 
 #############################################################################
 # DEPENDENCIES
