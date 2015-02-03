@@ -23,6 +23,7 @@ endif
 
 BUILD_GAME_SO    = 0
 BUILD_GAME_QVM   = 1
+BUILD_PK3S       = 1
 
 #############################################################################
 #
@@ -120,6 +121,7 @@ endif
 
 BD=$(BUILD_DIR)/debug-$(PLATFORM)-$(ARCH)
 BR=$(BUILD_DIR)/release-$(PLATFORM)-$(ARCH)
+MODPATH=hg
 CDIR=$(MOUNT_DIR)/client
 SDIR=$(MOUNT_DIR)/server
 RDIR=$(MOUNT_DIR)/renderer
@@ -694,22 +696,31 @@ endif #NetBSD
 endif #IRIX
 endif #SunOS
 
+PK3EXT=pk3
+QVMEXT=qvm
+
 TARGETS =
 
 ifneq ($(BUILD_GAME_SO),0)
   TARGETS += \
-    $(B)/base/cgame$(ARCH).$(SHLIBEXT) \
-    $(B)/base/game$(ARCH).$(SHLIBEXT) \
-    $(B)/base/ui$(ARCH).$(SHLIBEXT)
+    $(B)/$(MODPATH)/cgame$(ARCH).$(SHLIBEXT) \
+    $(B)/$(MODPATH)/game$(ARCH).$(SHLIBEXT) \
+    $(B)/$(MODPATH)/ui$(ARCH).$(SHLIBEXT)
 endif
 
 ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
     TARGETS += \
-      $(B)/base/vm/cgame.qvm \
-      $(B)/base/vm/game.qvm \
-      $(B)/base/vm/ui.qvm
+      $(B)/$(MODPATH)/vm/cgame.$(QVMEXT) \
+      $(B)/$(MODPATH)/vm/game.$(QVMEXT) \
+      $(B)/$(MODPATH)/vm/ui.$(QVMEXT)
   endif
+endif
+
+ifneq ($(BUILD_PK3S),0)
+  TARGETS += \
+    $(B)/$(MODPATH)/zui.$(PK3EXT) \
+    $(B)/$(MODPATH)/zvms.$(PK3EXT)
 endif
 
 ifeq ($(USE_CCACHE),1)
@@ -810,12 +821,12 @@ targets: makedirs tools
 makedirs:
 	@if [ ! -d $(BUILD_DIR) ];then $(MKDIR) $(BUILD_DIR);fi
 	@if [ ! -d $(B) ];then $(MKDIR) $(B);fi
-	@if [ ! -d $(B)/base/ ];then $(MKDIR) $(B)/base/;fi
-	@if [ ! -d $(B)/base/cgame ];then $(MKDIR) $(B)/base/cgame;fi
-	@if [ ! -d $(B)/base/game ];then $(MKDIR) $(B)/base/game;fi
-	@if [ ! -d $(B)/base/ui ];then $(MKDIR) $(B)/base/ui;fi
-	@if [ ! -d $(B)/base/qcommon ];then $(MKDIR) $(B)/base/qcommon;fi
-	@if [ ! -d $(B)/base/vm ];then $(MKDIR) $(B)/base/vm;fi
+	@if [ ! -d $(B)/$(MODPATH)/ ];then $(MKDIR) $(B)/$(MODPATH)/;fi
+	@if [ ! -d $(B)/$(MODPATH)/cgame ];then $(MKDIR) $(B)/$(MODPATH)/cgame;fi
+	@if [ ! -d $(B)/$(MODPATH)/game ];then $(MKDIR) $(B)/$(MODPATH)/game;fi
+	@if [ ! -d $(B)/$(MODPATH)/ui ];then $(MKDIR) $(B)/$(MODPATH)/ui;fi
+	@if [ ! -d $(B)/$(MODPATH)/qcommon ];then $(MKDIR) $(B)/$(MODPATH)/qcommon;fi
+	@if [ ! -d $(B)/$(MODPATH)/vm ];then $(MKDIR) $(B)/$(MODPATH)/vm;fi
 
 #############################################################################
 # QVM BUILD TOOLS
@@ -843,46 +854,46 @@ endef
 #############################################################################
 
 CGOBJ_ = \
-  $(B)/base/cgame/cg_main.o \
-  $(B)/base/game/bg_misc.o \
-  $(B)/base/game/bg_pmove.o \
-  $(B)/base/game/bg_slidemove.o \
-  $(B)/base/cgame/cg_consolecmds.o \
-  $(B)/base/cgame/cg_buildable.o \
-  $(B)/base/cgame/cg_animation.o \
-  $(B)/base/cgame/cg_animmapobj.o \
-  $(B)/base/cgame/cg_draw.o \
-  $(B)/base/cgame/cg_drawtools.o \
-  $(B)/base/cgame/cg_ents.o \
-  $(B)/base/cgame/cg_event.o \
-  $(B)/base/cgame/cg_marks.o \
-  $(B)/base/cgame/cg_players.o \
-  $(B)/base/cgame/cg_playerstate.o \
-  $(B)/base/cgame/cg_predict.o \
-  $(B)/base/cgame/cg_servercmds.o \
-  $(B)/base/cgame/cg_snapshot.o \
-  $(B)/base/cgame/cg_view.o \
-  $(B)/base/cgame/cg_weapons.o \
-  $(B)/base/cgame/cg_mem.o \
-  $(B)/base/cgame/cg_scanner.o \
-  $(B)/base/cgame/cg_attachment.o \
-  $(B)/base/cgame/cg_trails.o \
-  $(B)/base/cgame/cg_particles.o \
-  $(B)/base/cgame/cg_ptr.o \
-  $(B)/base/cgame/cg_tutorial.o \
-  $(B)/base/ui/ui_shared.o \
+  $(B)/$(MODPATH)/cgame/cg_main.o \
+  $(B)/$(MODPATH)/game/bg_misc.o \
+  $(B)/$(MODPATH)/game/bg_pmove.o \
+  $(B)/$(MODPATH)/game/bg_slidemove.o \
+  $(B)/$(MODPATH)/cgame/cg_consolecmds.o \
+  $(B)/$(MODPATH)/cgame/cg_buildable.o \
+  $(B)/$(MODPATH)/cgame/cg_animation.o \
+  $(B)/$(MODPATH)/cgame/cg_animmapobj.o \
+  $(B)/$(MODPATH)/cgame/cg_draw.o \
+  $(B)/$(MODPATH)/cgame/cg_drawtools.o \
+  $(B)/$(MODPATH)/cgame/cg_ents.o \
+  $(B)/$(MODPATH)/cgame/cg_event.o \
+  $(B)/$(MODPATH)/cgame/cg_marks.o \
+  $(B)/$(MODPATH)/cgame/cg_players.o \
+  $(B)/$(MODPATH)/cgame/cg_playerstate.o \
+  $(B)/$(MODPATH)/cgame/cg_predict.o \
+  $(B)/$(MODPATH)/cgame/cg_servercmds.o \
+  $(B)/$(MODPATH)/cgame/cg_snapshot.o \
+  $(B)/$(MODPATH)/cgame/cg_view.o \
+  $(B)/$(MODPATH)/cgame/cg_weapons.o \
+  $(B)/$(MODPATH)/cgame/cg_mem.o \
+  $(B)/$(MODPATH)/cgame/cg_scanner.o \
+  $(B)/$(MODPATH)/cgame/cg_attachment.o \
+  $(B)/$(MODPATH)/cgame/cg_trails.o \
+  $(B)/$(MODPATH)/cgame/cg_particles.o \
+  $(B)/$(MODPATH)/cgame/cg_ptr.o \
+  $(B)/$(MODPATH)/cgame/cg_tutorial.o \
+  $(B)/$(MODPATH)/ui/ui_shared.o \
   \
-  $(B)/base/qcommon/q_math.o \
-  $(B)/base/qcommon/q_shared.o
+  $(B)/$(MODPATH)/qcommon/q_math.o \
+  $(B)/$(MODPATH)/qcommon/q_shared.o
 
-CGOBJ = $(CGOBJ_) $(B)/base/cgame/cg_syscalls.o
-CGVMOBJ = $(CGOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
+CGOBJ = $(CGOBJ_) $(B)/$(MODPATH)/cgame/cg_syscalls.o
+CGVMOBJ = $(CGOBJ_:%.o=%.asm) $(B)/$(MODPATH)/game/bg_lib.asm
 
-$(B)/base/cgame$(ARCH).$(SHLIBEXT) : $(CGOBJ)
+$(B)/$(MODPATH)/cgame$(ARCH).$(SHLIBEXT) : $(CGOBJ)
 	@echo "LD $@"
 	@$(CC) $(SHLIBLDFLAGS) -o $@ $(CGOBJ)
 
-$(B)/base/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
+$(B)/$(MODPATH)/vm/cgame.$(QVMEXT): $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 	@echo "Q3ASM $@"
 	@$(Q3ASM) -o $@ $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 
@@ -893,43 +904,43 @@ $(B)/base/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 #############################################################################
 
 GOBJ_ = \
-  $(B)/base/game/g_main.o \
-  $(B)/base/game/bg_misc.o \
-  $(B)/base/game/bg_pmove.o \
-  $(B)/base/game/bg_slidemove.o \
-  $(B)/base/game/g_mem.o \
-  $(B)/base/game/g_active.o \
-  $(B)/base/game/g_client.o \
-  $(B)/base/game/g_cmds.o \
-  $(B)/base/game/g_combat.o \
-  $(B)/base/game/g_physics.o \
-  $(B)/base/game/g_buildable.o \
-  $(B)/base/game/g_misc.o \
-  $(B)/base/game/g_missile.o \
-  $(B)/base/game/g_mover.o \
-  $(B)/base/game/g_session.o \
-  $(B)/base/game/g_spawn.o \
-  $(B)/base/game/g_svcmds.o \
-  $(B)/base/game/g_target.o \
-  $(B)/base/game/g_team.o \
-  $(B)/base/game/g_trigger.o \
-  $(B)/base/game/g_utils.o \
-  $(B)/base/game/g_maprotation.o \
-  $(B)/base/game/g_ptr.o \
-  $(B)/base/game/g_weapon.o \
-  $(B)/base/game/g_admin.o \
+  $(B)/$(MODPATH)/game/g_main.o \
+  $(B)/$(MODPATH)/game/bg_misc.o \
+  $(B)/$(MODPATH)/game/bg_pmove.o \
+  $(B)/$(MODPATH)/game/bg_slidemove.o \
+  $(B)/$(MODPATH)/game/g_mem.o \
+  $(B)/$(MODPATH)/game/g_active.o \
+  $(B)/$(MODPATH)/game/g_client.o \
+  $(B)/$(MODPATH)/game/g_cmds.o \
+  $(B)/$(MODPATH)/game/g_combat.o \
+  $(B)/$(MODPATH)/game/g_physics.o \
+  $(B)/$(MODPATH)/game/g_buildable.o \
+  $(B)/$(MODPATH)/game/g_misc.o \
+  $(B)/$(MODPATH)/game/g_missile.o \
+  $(B)/$(MODPATH)/game/g_mover.o \
+  $(B)/$(MODPATH)/game/g_session.o \
+  $(B)/$(MODPATH)/game/g_spawn.o \
+  $(B)/$(MODPATH)/game/g_svcmds.o \
+  $(B)/$(MODPATH)/game/g_target.o \
+  $(B)/$(MODPATH)/game/g_team.o \
+  $(B)/$(MODPATH)/game/g_trigger.o \
+  $(B)/$(MODPATH)/game/g_utils.o \
+  $(B)/$(MODPATH)/game/g_maprotation.o \
+  $(B)/$(MODPATH)/game/g_ptr.o \
+  $(B)/$(MODPATH)/game/g_weapon.o \
+  $(B)/$(MODPATH)/game/g_admin.o \
   \
-  $(B)/base/qcommon/q_math.o \
-  $(B)/base/qcommon/q_shared.o
+  $(B)/$(MODPATH)/qcommon/q_math.o \
+  $(B)/$(MODPATH)/qcommon/q_shared.o
 
-GOBJ = $(GOBJ_) $(B)/base/game/g_syscalls.o
-GVMOBJ = $(GOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
+GOBJ = $(GOBJ_) $(B)/$(MODPATH)/game/g_syscalls.o
+GVMOBJ = $(GOBJ_:%.o=%.asm) $(B)/$(MODPATH)/game/bg_lib.asm
 
-$(B)/base/game$(ARCH).$(SHLIBEXT) : $(GOBJ)
+$(B)/$(MODPATH)/game$(ARCH).$(SHLIBEXT) : $(GOBJ)
 	@echo "LD $@"
 	@$(CC) $(SHLIBLDFLAGS) -o $@ $(GOBJ)
 
-$(B)/base/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm
+$(B)/$(MODPATH)/vm/game.$(QVMEXT): $(GVMOBJ) $(GDIR)/g_syscalls.asm
 	@echo "Q3ASM $@"
 	@$(Q3ASM) -o $@ $(GVMOBJ) $(GDIR)/g_syscalls.asm
 
@@ -940,24 +951,24 @@ $(B)/base/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm
 #############################################################################
 
 UIOBJ_ = \
-  $(B)/base/ui/ui_main.o \
-  $(B)/base/ui/ui_atoms.o \
-  $(B)/base/ui/ui_players.o \
-  $(B)/base/ui/ui_shared.o \
-  $(B)/base/ui/ui_gameinfo.o \
+  $(B)/$(MODPATH)/ui/ui_main.o \
+  $(B)/$(MODPATH)/ui/ui_atoms.o \
+  $(B)/$(MODPATH)/ui/ui_players.o \
+  $(B)/$(MODPATH)/ui/ui_shared.o \
+  $(B)/$(MODPATH)/ui/ui_gameinfo.o \
   \
-  $(B)/base/game/bg_misc.o \
-  $(B)/base/qcommon/q_math.o \
-  $(B)/base/qcommon/q_shared.o
+  $(B)/$(MODPATH)/game/bg_misc.o \
+  $(B)/$(MODPATH)/qcommon/q_math.o \
+  $(B)/$(MODPATH)/qcommon/q_shared.o
 
-UIOBJ = $(UIOBJ_) $(B)/base/ui/ui_syscalls.o
-UIVMOBJ = $(UIOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
+UIOBJ = $(UIOBJ_) $(B)/$(MODPATH)/ui/ui_syscalls.o
+UIVMOBJ = $(UIOBJ_:%.o=%.asm) $(B)/$(MODPATH)/game/bg_lib.asm
 
-$(B)/base/ui$(ARCH).$(SHLIBEXT) : $(UIOBJ)
+$(B)/$(MODPATH)/ui$(ARCH).$(SHLIBEXT) : $(UIOBJ)
 	@echo "LD $@"
 	@$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
 
-$(B)/base/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
+$(B)/$(MODPATH)/vm/ui.$(QVMEXT): $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 	@echo "Q3ASM $@"
 	@$(Q3ASM) -o $@ $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 
@@ -967,31 +978,31 @@ $(B)/base/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 ## GAME MODULE RULES
 #############################################################################
 
-$(B)/base/cgame/%.o: $(CGDIR)/%.c
+$(B)/$(MODPATH)/cgame/%.o: $(CGDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/base/cgame/%.asm: $(CGDIR)/%.c
+$(B)/$(MODPATH)/cgame/%.asm: $(CGDIR)/%.c
 	$(DO_Q3LCC)
 
 
-$(B)/base/game/%.o: $(GDIR)/%.c
+$(B)/$(MODPATH)/game/%.o: $(GDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/base/game/%.asm: $(GDIR)/%.c
+$(B)/$(MODPATH)/game/%.asm: $(GDIR)/%.c
 	$(DO_Q3LCC)
 
 
-$(B)/base/ui/%.o: $(UIDIR)/%.c
+$(B)/$(MODPATH)/ui/%.o: $(UIDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/base/ui/%.asm: $(UIDIR)/%.c
+$(B)/$(MODPATH)/ui/%.asm: $(UIDIR)/%.c
 	$(DO_Q3LCC)
 
 
-$(B)/base/qcommon/%.o: $(CMDIR)/%.c
+$(B)/$(MODPATH)/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/base/qcommon/%.asm: $(CMDIR)/%.c
+$(B)/$(MODPATH)/qcommon/%.asm: $(CMDIR)/%.c
 	$(DO_Q3LCC)
 
 
@@ -1027,6 +1038,17 @@ dist:
 	svn export . tremulous-$(SVN_VERSION)
 	tar --owner=root --group=root --force-local -cjf tremulous-$(SVN_VERSION).tar.bz2 tremulous-$(SVN_VERSION)
 	rm -rf tremulous-$(SVN_VERSION)
+
+#############################################################################
+# PK3s
+#############################################################################
+$(B)/$(MODPATH)/zui.$(PK3EXT):
+	@echo "QZIP $@"
+	@echo `git diff --name-only 192e67a68 ui|sed s/trunk\\\\///` | xargs zip $@
+
+$(B)/$(MODPATH)/zvms.$(PK3EXT):
+	@echo "QZIP $@"
+	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/*
 
 #############################################################################
 # DEPENDENCIES
