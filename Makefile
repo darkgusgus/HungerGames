@@ -1044,11 +1044,11 @@ dist:
 #############################################################################
 $(B)/$(MODPATH)/zui.$(PK3EXT):
 	@echo "QZIP $@"
-	@echo `git diff --name-only 192e67a68 ui|sed s/trunk\\\\///` | xargs zip $@
+	-	@echo `git diff --name-only cd4da82 ui|sed s/trunk\\\\///` | xargs zip $@
 
 $(B)/$(MODPATH)/zvms.$(PK3EXT):
 	@echo "QZIP $@"
-	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/*
+	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/cgame.$(QVMEXT) vm/ui.$(QVMEXT)
 
 #############################################################################
 # DEPENDENCIES
