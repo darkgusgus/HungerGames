@@ -1,3 +1,4 @@
+makefile.local
 build/
 src/tools/asm/q3asm
 src/tools/asm/q3asm.exe
