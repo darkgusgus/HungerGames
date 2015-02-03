@@ -2529,12 +2529,9 @@ static void CG_ScanForCrosshairEntity( void )
 
   team = cgs.clientinfo[ trace.entityNum ].team;
 
+  // HG: only display team names if spectator
   if( cg.snap->ps.persistant[ PERS_TEAM ] != TEAM_SPECTATOR )
-  {
-    //only display team names of those on the same team as this player
-    if( team != cg.snap->ps.stats[ STAT_PTEAM ] )
-      return;
-  }
+    return;
 
   // update the fade timer
   cg.crosshairClientNum = trace.entityNum;
