@@ -1048,7 +1048,7 @@ $(B)/$(MODPATH)/zui.$(PK3EXT):
 
 $(B)/$(MODPATH)/zvms.$(PK3EXT):
 	@echo "QZIP $@"
-	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/cgame.qvm vm/ui.qvm
+	@cd $(B)/$(MODPATH); zip zvms.$(PK3EXT) vm/cgame.$(QVMEXT) vm/ui.$(QVMEXT)
 
 #############################################################################
 # DEPENDENCIES

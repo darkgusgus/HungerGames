@@ -247,7 +247,6 @@ vmCvar_t  g_tipPrepend;
 // Keep these local since they won't be used elsewhere?
 // Another idea is to store in level_locals_t
 int       lastTipTime;
-int       tipIndex;
 char      tipCache[HG_MAX_TIP_COUNT][HG_MAX_TIP_LENGTH + 1];
 int       tipCacheSize;
 
@@ -3078,7 +3077,6 @@ void G_InitTips( void )
   char message[ MAX_STRING_CHARS ], *cr;
 
   lastTipTime = level.startTime;
-  tipIndex = 0;
   tipCacheSize = 0;
 
   // Most of this pulled from !info
@@ -3154,11 +3152,13 @@ Shows a tip every g_tipTime
 */
 void G_ShowTips( void )
 {
+  static int seed = 69;
+  int randNum;
   if(tipCacheSize <= 0 || (level.time - lastTipTime) < g_tipTime.integer * 1000)
     return;
-  if(tipIndex >= tipCacheSize)
-    tipIndex = 0;
-  trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[tipIndex] ) );
+  
+  randNum = Q_rand(&seed);
+
+  trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[abs(randNum % tipCacheSize)] ) ); // not exactly but other places use it
   lastTipTime = level.time;
-  tipIndex++;
 }
