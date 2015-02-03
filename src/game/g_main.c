@@ -885,7 +885,23 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
     level.humanTeamLocked=qtrue;
     trap_Cvar_Set( "g_lockTeamsAtStart", "0" );
   }
-      level.alienTeamLocked=qtrue;
+
+  level.alienTeamLocked=qtrue;
+
+  // HG opens doors in Uncreation
+  {
+    int i;
+    gentity_t *ent;
+
+    for( i = 1, ent = g_entities + i ; i < level.num_entities ; i++, ent++ )
+    {
+      if( !ent->inuse )
+        continue;
+
+      if( !Q_stricmp( ent->classname, "trigger_stage" ) )
+        ent->use( ent, ent, ent );
+    }
+  }
 }
 
 /*
