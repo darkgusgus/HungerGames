@@ -1368,7 +1368,7 @@ void G_CalculateBuildPoints( void )
       if( level.suddenDeathWarning < TW_PASSED )
       {
         trap_SendServerCommand( -1, "cp \"The Hunger games have begun!\"" );
-		trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
+        trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
         G_LogPrintf("Beginning Sudden Death (Mode %d)\n",g_suddenDeathMode.integer);
         localHTP = 0;
         localATP = 0;
@@ -1426,7 +1426,7 @@ void G_CalculateBuildPoints( void )
   }
   
   //set BP at each cycle
-  if( g_suddenDeath.integer )
+  if( !g_cheats.integer && g_suddenDeath.integer )
   {
     localHTP = level.suddenDeathHBuildPoints;
     localATP = level.suddenDeathABuildPoints;
@@ -2510,6 +2510,10 @@ void CheckExitRules( void )
       level.timelimitWarning = TW_PASSED;
     }
   }
+
+  //HG no win in devmap
+  if ( g_cheats.integer )
+    return;
 
   //HG win
   if( level.uncondHumanWin ||

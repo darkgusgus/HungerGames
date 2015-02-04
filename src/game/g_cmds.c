@@ -3007,7 +3007,7 @@ void Cmd_Destroy_f( gentity_t *ent )
         return;
 
       // Don't allow destruction of buildables that cannot be rebuilt
-      if(g_suddenDeath.integer && traceEnt->health > 0 &&
+      if(!g_cheats.integer && g_suddenDeath.integer && traceEnt->health > 0 &&
           ( ( g_suddenDeathMode.integer == SDMODE_SELECTIVE &&
               !BG_FindReplaceableTestForBuildable( traceEnt->s.modelindex ) ) ||
             ( g_suddenDeathMode.integer == SDMODE_BP &&
@@ -3147,7 +3147,7 @@ void Cmd_Mark_f( gentity_t *ent )
       }
 
       // Don't allow marking of buildables that cannot be rebuilt
-      if(g_suddenDeath.integer && traceEnt->health > 0 &&
+      if(!g_cheats.integer && g_suddenDeath.integer && traceEnt->health > 0 &&
           ( ( g_suddenDeathMode.integer == SDMODE_SELECTIVE &&
               !BG_FindReplaceableTestForBuildable( traceEnt->s.modelindex ) ) ||
             ( g_suddenDeathMode.integer == SDMODE_BP &&
@@ -3685,7 +3685,7 @@ void Cmd_Build_f( gentity_t *ent )
   buildable = BG_FindBuildNumForName( s );
 
 
-  if( g_suddenDeath.integer)
+  if( g_suddenDeath.integer && !g_cheats.integer )
   {
     if( g_suddenDeathMode.integer == SDMODE_SELECTIVE )
     {
