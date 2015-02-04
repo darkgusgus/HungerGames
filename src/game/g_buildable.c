@@ -180,6 +180,9 @@ static qboolean G_FindPower( gentity_t *self )
   if( self->biteam != BIT_HUMANS )
     return qfalse;
 
+  // HG always has power
+  return qtrue;
+
   //reactor is always powered
   if( self->s.modelindex == BA_H_REACTOR )
     return qtrue;
