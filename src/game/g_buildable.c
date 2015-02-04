@@ -3196,6 +3196,10 @@ itemBuildError_t G_CanBuild( gentity_t *ent, buildable_t buildable, int distance
   minNormal = BG_FindMinNormalForBuildable( buildable );
   invert = BG_FindInvertNormalForBuildable( buildable );
 
+  //HG only devmap build
+  if( !g_cheats.integer )
+    reason = IBE_PERMISSION;
+
   //can we build at this angle?
   if( !( normal[ 2 ] >= minNormal || ( invert && normal[ 2 ] <= -minNormal ) ) )
     reason = IBE_NORMAL;

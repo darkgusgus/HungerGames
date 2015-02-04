@@ -2915,6 +2915,10 @@ void Cmd_Destroy_f( gentity_t *ent )
   char        cmd[ 12 ];
   qboolean    deconstruct = qtrue;
 
+  //HG only devmap build
+  if( !g_cheats.integer )
+    return;
+
   if( ent->client->pers.denyBuild )
   {
     trap_SendServerCommand( ent-g_entities,
