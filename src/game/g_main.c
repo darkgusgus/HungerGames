@@ -1589,8 +1589,8 @@ void G_CalculateStages( void )
 */
   // Update stage every specified time
   // Normal stage update for aliens since they are not part of the game
-  if( (level.time - level.startTime) >= (hg_stage2AdvanceTime.integer * 60000 ) &&
-    g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 )
+  if( g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 && level.suddenDeathBeginTime >= 0 &&
+    ( level.time - level.suddenDeathBeginTime ) >= ( hg_stage2AdvanceTime.integer * 60000 ) )
   {
     trap_Cvar_Set( "g_humanStage", va( "%d", S2 ) );
     level.humanStage2Time = level.time;
@@ -1598,8 +1598,8 @@ void G_CalculateStages( void )
     G_LogPrintf(va("Stage: H 2: Humans reached Stage 2 at time %d\n", (level.time - level.startTime) / 60000));
   }
 
-  if( (level.time - level.startTime) >= (hg_stage3AdvanceTime.integer * 60000 ) &&
-    g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 )
+  if( g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 && level.suddenDeathBeginTime >= 0 &&
+    ( level.time - level.suddenDeathBeginTime ) >= ( hg_stage3AdvanceTime.integer * 60000 ) )
   {
     trap_Cvar_Set( "g_humanStage", va( "%d", S3 ) );
     level.humanStage3Time = level.time;
