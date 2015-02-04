@@ -1368,7 +1368,8 @@ void G_CalculateBuildPoints( void )
       if( level.suddenDeathWarning < TW_PASSED )
       {
         trap_SendServerCommand( -1, "cp \"The Hunger games have begun!\"" );
-        trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
+        if( !g_cheats.integer )
+          trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
         G_LogPrintf("Beginning Sudden Death (Mode %d)\n",g_suddenDeathMode.integer);
         localHTP = 0;
         localATP = 0;
