@@ -8,21 +8,18 @@
 
 {
   name alienteam
-  text "The Alien Team\n\n"
-  text "The Aliens' strengths are in movement "
-  text "and the ability to quickly construct new bases quickly. They possess a "
-  text "range of abilities including basic melee attacks, movement-"
-  text "crippling poisons and more."
+  text "The Hounds\n\n"
+  text "If the survivors have ommited to kill all of the "
+  text "eggs before the hounds get released. You may join this "
+  text "team and try to finish off the last survivors"
   align left
 }
 
 {
   name humanteam
-  text "The Human Team\n\n"
-  text "The humans are the masters of technology. Although their bases take "
-  text "long to construct, their automated defense ensures they stay built. "
-  text "A wide range of upgrades and weapons are available to the humans, each "
-  text "contributing to eradicate the alien threat."
+  text "Survivors\n\n"
+  text "Survivors spawn with Rifle and must do their best to get credits "
+  text "and surviving from other survivors. "
   align left
 }
 
