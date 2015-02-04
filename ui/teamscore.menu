@@ -59,7 +59,7 @@
     itemDef
     {
       name humanteamname
-      text "Humans"
+      text "Survivors"
       textalign ITEM_ALIGN_RIGHT
       textscale .5
       textaligny 26
