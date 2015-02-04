@@ -184,7 +184,7 @@ static qboolean G_FindPower( gentity_t *self )
   return qtrue;
 
   //reactor is always powered
-  if( self->s.modelindex == BA_H_REACTOR )
+  /*if( self->s.modelindex == BA_H_REACTOR )
     return qtrue;
 
   //if this already has power then stop now
@@ -226,6 +226,7 @@ static qboolean G_FindPower( gentity_t *self )
   }
   else
     return qfalse;
+  */
 }
 
 /*

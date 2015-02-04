@@ -1034,10 +1034,10 @@ distclean: clean toolsclean
 	@rm -rf $(BUILD_DIR)
 
 dist:
-	rm -rf tremulous-$(SVN_VERSION)
-	svn export . tremulous-$(SVN_VERSION)
-	tar --owner=root --group=root --force-local -cjf tremulous-$(SVN_VERSION).tar.bz2 tremulous-$(SVN_VERSION)
-	rm -rf tremulous-$(SVN_VERSION)
+	@rm -rf tremulous-$(SVN_VERSION)
+	@svn export . tremulous-$(SVN_VERSION)
+	@tar --owner=root --group=root --force-local -cjf tremulous-$(SVN_VERSION).tar.bz2 tremulous-$(SVN_VERSION)
+	@rm -rf tremulous-$(SVN_VERSION)
 
 #############################################################################
 # PK3s
