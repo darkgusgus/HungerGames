@@ -4244,7 +4244,7 @@ upgradeAttributes_t bg_upgrades[ ] =
   {
     UP_JETPACK,             //int   upgradeNum;
     JETPACK_PRICE,          //int   price;
-    ( 1 << S2 )|( 1 << S3 ), //int  stages
+   ( 1 << S1 )|( 1 << S2 )|( 1 << S3 ), //int  stages
     SLOT_BACKPACK,          //int   slots;
     "jetpack",              //char  *upgradeName;
     "Jet Pack",             //char  *upgradeHumanName;
