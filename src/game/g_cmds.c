@@ -1810,17 +1810,17 @@ void Cmd_CallVote_f( gentity_t *ent )
    {
      if(!g_hungerGamesVotePercent.integer)
      {
-       trap_SendServerCommand( ent-g_entities, "print \"Sudden Death votes have been disabled\n\"" );
+       trap_SendServerCommand( ent-g_entities, "print \"Hunger Games votes have been disabled\n\"" );
        return;
      } 
      else if( g_hungerGames.integer ) 
      {
-      trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Sudden Death has already begun\n\"") );
+      trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Hunger Games has already begun\n\"") );
       return;
      }
      else if( G_TimeTilHungerGames() <= g_hungerGamesVoteDelay.integer * 1000 )
      {
-      trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Sudden Death is already immenent\n\"") );
+      trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Hunger Games is already immenent\n\"") );
       return;
      }
     else 
@@ -1828,7 +1828,7 @@ void Cmd_CallVote_f( gentity_t *ent )
        level.votePassThreshold = g_hungerGamesVotePercent.integer;
        Com_sprintf( level.voteString, sizeof( level.voteString ), "hungergames" );
        Com_sprintf( level.voteDisplayString,
-           sizeof( level.voteDisplayString ), "Begin sudden death" );
+           sizeof( level.voteDisplayString ), "Begin hunger games" );
 
        if( g_hungerGamesVoteDelay.integer )
          Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( " in %d seconds", g_hungerGamesVoteDelay.integer ) );
@@ -3016,7 +3016,7 @@ void Cmd_Destroy_f( gentity_t *ent )
             g_hungerGamesMode.integer == SDMODE_NO_DECON ) )
       {
         trap_SendServerCommand( ent-g_entities,
-          "print \"During Sudden Death you can only decon buildings that "
+          "print \"During Hunger Games you can only decon buildings that "
           "can be rebuilt\n\"" );
         return;
       }
@@ -3156,7 +3156,7 @@ void Cmd_Mark_f( gentity_t *ent )
             g_hungerGamesMode.integer == SDMODE_NO_DECON ) )
       {
         trap_SendServerCommand( ent-g_entities,
-          "print \"During Sudden Death you can only mark buildings that "
+          "print \"During Hunger Games you can only mark buildings that "
           "can be rebuilt\n\"" );
         return;
       }
@@ -3692,20 +3692,20 @@ void Cmd_Build_f( gentity_t *ent )
       if( !BG_FindReplaceableTestForBuildable( buildable ) )
       {
         trap_SendServerCommand( ent-g_entities,
-          "print \"This building type cannot be rebuilt during Sudden Death\n\"" );
+          "print \"This building type cannot be rebuilt during Hunger Games\n\"" );
         return;
       }
       if( G_BuildingExists( buildable ) )
       {
         trap_SendServerCommand( ent-g_entities,
-          "print \"You can only rebuild one of each type of rebuildable building during Sudden Death.\n\"" );
+          "print \"You can only rebuild one of each type of rebuildable building during Hunger Games.\n\"" );
         return;
       }
     }
     else if( g_hungerGamesMode.integer == SDMODE_NO_BUILD )
     {
       trap_SendServerCommand( ent-g_entities,
-        "print \"Building is not allowed during Sudden Death\n\"" );
+        "print \"Building is not allowed during Hunger Games\n\"" );
       return;
     }
   }

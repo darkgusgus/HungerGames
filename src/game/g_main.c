@@ -1364,13 +1364,13 @@ void G_CalculateBuildPoints( void )
   {
     if(g_hungerGames.integer || G_TimeTilHungerGames( ) <= 0 ) //Conditions to enter SD
     {
-      //begin sudden death
+      //begin hunger games
       if( level.hungerGamesWarning < TW_PASSED )
       {
         trap_SendServerCommand( -1, "cp \"The Hunger games have begun!\"" );
         if( !g_cheats.integer )
           trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
-        G_LogPrintf("Beginning Sudden Death (Mode %d)\n",g_hungerGamesMode.integer);
+        G_LogPrintf("Beginning Hunger Games (Mode %d)\n",g_hungerGamesMode.integer);
         localHTP = 0;
         localATP = 0;
 
@@ -1415,7 +1415,7 @@ void G_CalculateBuildPoints( void )
     }  
     else 
     {
-       //warn about sudden death
+       //warn about hunger games
        if( ( G_TimeTilHungerGames( ) <= 60000 ) &&
            (  level.hungerGamesWarning < TW_IMMINENT ) )
        {
@@ -2585,7 +2585,7 @@ void CheckVote( void )
       level.voteString[0] = '\0';
 
       if( g_hungerGamesVoteDelay.integer )
-        trap_SendServerCommand( -1, va("cp \"Sudden Death will begin in %d seconds\n\"", g_hungerGamesVoteDelay.integer  ) );
+        trap_SendServerCommand( -1, va("cp \"Hunger Games will begin in %d seconds\n\"", g_hungerGamesVoteDelay.integer  ) );
     }
 
     if( level.voteString[0] )
