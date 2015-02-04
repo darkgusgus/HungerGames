@@ -1630,10 +1630,6 @@ void ClientThink_real( gentity_t *ent )
       if( random( ) > JETPACK_DISABLE_CHANCE )
         client->ps.pm_type = PM_NORMAL;
     }
-
-    //switch jetpack off if no reactor
-    if( !level.reactorPresent )
-      BG_DeactivateUpgrade( UP_JETPACK, client->ps.stats );
   }
 
   // set up for pmove
