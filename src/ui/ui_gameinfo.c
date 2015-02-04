@@ -318,7 +318,7 @@ void UI_ServerInfo( void )
     trap_Cvar_Set( "ui_serverinfo_timelimit",
       Info_ValueForKey( info, "timelimit" ) );
     trap_Cvar_Set( "ui_serverinfo_sd",
-      Info_ValueForKey( info, "g_suddenDeathTime" ) );
+      Info_ValueForKey( info, "g_hungerGamesTime" ) );
     trap_Cvar_Set( "ui_serverinfo_hostname",
       Info_ValueForKey( info, "sv_hostname" ) );
     trap_Cvar_Set( "ui_serverinfo_maxclients",

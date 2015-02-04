@@ -850,7 +850,7 @@ void AOvermind_Think( gentity_t *self )
         }
       }
       // aliens now know they have no eggs, but they're screwed, so stfu
-      if( !haveBuilder || G_TimeTilSuddenDeath( ) <= 0 )
+      if( !haveBuilder || G_TimeTilHungerGames( ) <= 0 )
         level.overmindMuted = qtrue;
     }
 

@@ -765,11 +765,11 @@ typedef struct
 
   pTeam_t           lastWin;
 
-  int               suddenDeathABuildPoints;
-  int               suddenDeathHBuildPoints;
-  qboolean          suddenDeath;
-  int               suddenDeathBeginTime;
-  timeWarning_t     suddenDeathWarning;
+  int               hungerGamesABuildPoints;
+  int               hungerGamesHBuildPoints;
+  qboolean          hungerGames;
+  int               hungerGamesBeginTime;
+  timeWarning_t     hungerGamesWarning;
   timeWarning_t     timelimitWarning;
   int               extend_vote_count;
 
@@ -1145,7 +1145,7 @@ void QDECL G_Error( const char *fmt, ... );
 void CheckVote( void );
 void CheckTeamVote( int teamnum );
 void LogExit( const char *string );
-int  G_TimeTilSuddenDeath( void );
+int  G_TimeTilHungerGames( void );
 void CheckMsgTimer( void );
 qboolean G_Flood_Limited( gentity_t *ent );
 
@@ -1315,9 +1315,9 @@ extern  vmCvar_t  g_newbieNumbering;
 extern  vmCvar_t  g_newbieNamePrefix;
 
 extern  vmCvar_t  g_timelimit;
-extern  vmCvar_t  g_suddenDeathTime;
-extern  vmCvar_t  g_suddenDeath;
-extern  vmCvar_t  g_suddenDeathMode;
+extern  vmCvar_t  g_hungerGamesTime;
+extern  vmCvar_t  g_hungerGames;
+extern  vmCvar_t  g_hungerGamesMode;
 extern  vmCvar_t  g_friendlyFire;
 extern  vmCvar_t  g_friendlyFireHumans;
 extern  vmCvar_t  g_friendlyFireAliens;
@@ -1345,8 +1345,8 @@ extern  vmCvar_t  g_blood;
 extern  vmCvar_t  g_allowVote;
 extern  vmCvar_t  g_requireVoteReasons;
 extern  vmCvar_t  g_voteLimit;
-extern  vmCvar_t  g_suddenDeathVotePercent;
-extern  vmCvar_t  g_suddenDeathVoteDelay;
+extern  vmCvar_t  g_hungerGamesVotePercent;
+extern  vmCvar_t  g_hungerGamesVoteDelay;
 extern  vmCvar_t  g_extendVotesPercent;
 extern  vmCvar_t  g_extendVotesTime;
 extern  vmCvar_t  g_extendVotesCount;

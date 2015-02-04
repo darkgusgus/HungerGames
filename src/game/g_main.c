@@ -44,9 +44,9 @@ gclient_t   g_clients[ MAX_CLIENTS ];
 
 vmCvar_t  g_fraglimit;
 vmCvar_t  g_timelimit;
-vmCvar_t  g_suddenDeathTime;
-vmCvar_t  g_suddenDeath;
-vmCvar_t  g_suddenDeathMode;
+vmCvar_t  g_hungerGamesTime;
+vmCvar_t  g_hungerGames;
+vmCvar_t  g_hungerGamesMode;
 vmCvar_t  g_capturelimit;
 vmCvar_t  g_friendlyFire;
 vmCvar_t  g_friendlyFireAliens;
@@ -85,8 +85,8 @@ vmCvar_t  g_podiumDrop;
 vmCvar_t  g_allowVote;
 vmCvar_t  g_requireVoteReasons;
 vmCvar_t  g_voteLimit;
-vmCvar_t  g_suddenDeathVotePercent;
-vmCvar_t  g_suddenDeathVoteDelay;
+vmCvar_t  g_hungerGamesVotePercent;
+vmCvar_t  g_hungerGamesVoteDelay;
 vmCvar_t  g_extendVotesPercent;
 vmCvar_t  g_extendVotesTime;
 vmCvar_t  g_extendVotesCount;
@@ -272,9 +272,9 @@ static cvarTable_t   gameCvarTable[ ] =
 
   // change anytime vars
   { &g_timelimit, "timelimit", "45", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-  { &g_suddenDeathTime, "g_suddenDeathTime", "30", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-  { &g_suddenDeathMode, "g_suddenDeathMode", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-  { &g_suddenDeath, "g_suddenDeath", "0", CVAR_SERVERINFO | CVAR_NORESTART, 0, qtrue },
+  { &g_hungerGamesTime, "g_hungerGamesTime", "1", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+  { &g_hungerGamesMode, "g_hungerGamesMode", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+  { &g_hungerGames, "g_hungerGames", "0", CVAR_SERVERINFO | CVAR_NORESTART, 0, qtrue },
 
   { &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO, 0, qfalse  },
 
@@ -332,8 +332,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_voteMinTime, "g_voteMinTime", "120", CVAR_ARCHIVE, 0, qfalse },
   { &g_mapvoteMaxTime, "g_mapvoteMaxTime", "240", CVAR_ARCHIVE, 0, qfalse },
   { &g_votableMaps, "g_votableMaps", "", CVAR_ARCHIVE, 0, qtrue },
-  { &g_suddenDeathVotePercent, "g_suddenDeathVotePercent", "74", CVAR_ARCHIVE, 0, qfalse },
-  { &g_suddenDeathVoteDelay, "g_suddenDeathVoteDelay", "180", CVAR_ARCHIVE, 0, qfalse },
+  { &g_hungerGamesVotePercent, "g_hungerGamesVotePercent", "74", CVAR_ARCHIVE, 0, qfalse },
+  { &g_hungerGamesVoteDelay, "g_hungerGamesVoteDelay", "180", CVAR_ARCHIVE, 0, qfalse },
   { &g_customVote1, "g_customVote1", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_customVote2, "g_customVote2", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_customVote3, "g_customVote3", "", CVAR_ARCHIVE, 0, qfalse  },
@@ -867,8 +867,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
   trap_Cvar_Set( "g_humanStage", va( "%d", S1 ) );
   trap_Cvar_Set( "g_alienKills", 0 );
   trap_Cvar_Set( "g_humanKills", 0 );
-  trap_Cvar_Set( "g_suddenDeath", 0 );
-  level.suddenDeathBeginTime = g_suddenDeathTime.integer * 60000;
+  trap_Cvar_Set( "g_hungerGames", 0 );
+  level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
 
   G_Printf( "-----------------------------------\n" );
 
@@ -1315,15 +1315,15 @@ void G_CountSpawns( void )
 
 /*
 ============
-G_TimeTilSuddenDeath
+G_TimeTilHungerGames
 ============
 */
-int G_TimeTilSuddenDeath( void )
+int G_TimeTilHungerGames( void )
 {
-  if( (!g_suddenDeathTime.integer && level.suddenDeathBeginTime==0 ) || level.suddenDeathBeginTime<0 )
+  if( (!g_hungerGamesTime.integer && level.hungerGamesBeginTime==0 ) || level.hungerGamesBeginTime<0 )
     return 999999999; // Always some time away
 
-  return ( ( level.suddenDeathBeginTime ) - ( level.time - level.startTime ) );
+  return ( ( level.hungerGamesBeginTime ) - ( level.time - level.startTime ) );
 }
 
 
@@ -1344,33 +1344,33 @@ void G_CalculateBuildPoints( void )
   int         localHTP = g_humanBuildPoints.integer,
               localATP = g_alienBuildPoints.integer;
 
-  // g_suddenDeath sets what state we want it to be.  
-  // level.suddenDeath says whether we've calculated BPs at the 'start' of SD or not
+  // g_hungerGames sets what state we want it to be.  
+  // level.hungerGames says whether we've calculated BPs at the 'start' of SD or not
 
   // reset if SD was on, but now it's off
-  if(!g_suddenDeath.integer && level.suddenDeath) 
+  if(!g_hungerGames.integer && level.hungerGames) 
   {
 
-    level.suddenDeath=qfalse;
-    level.suddenDeathWarning=0;
-    level.suddenDeathBeginTime = -1;
-    if((level.time - level.startTime) < (g_suddenDeathTime.integer * 60000 ) )
-      level.suddenDeathBeginTime = g_suddenDeathTime.integer * 60000;
+    level.hungerGames=qfalse;
+    level.hungerGamesWarning=0;
+    level.hungerGamesBeginTime = -1;
+    if((level.time - level.startTime) < (g_hungerGamesTime.integer * 60000 ) )
+      level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
     else
-      level.suddenDeathBeginTime = -1;
+      level.hungerGamesBeginTime = -1;
   }
 
-  if(!level.suddenDeath)
+  if(!level.hungerGames)
   {
-    if(g_suddenDeath.integer || G_TimeTilSuddenDeath( ) <= 0 ) //Conditions to enter SD
+    if(g_hungerGames.integer || G_TimeTilHungerGames( ) <= 0 ) //Conditions to enter SD
     {
       //begin sudden death
-      if( level.suddenDeathWarning < TW_PASSED )
+      if( level.hungerGamesWarning < TW_PASSED )
       {
         trap_SendServerCommand( -1, "cp \"The Hunger games have begun!\"" );
         if( !g_cheats.integer )
           trap_SendConsoleCommand( EXEC_NOW, "alienWin\n" );
-        G_LogPrintf("Beginning Sudden Death (Mode %d)\n",g_suddenDeathMode.integer);
+        G_LogPrintf("Beginning Sudden Death (Mode %d)\n",g_hungerGamesMode.integer);
         localHTP = 0;
         localATP = 0;
 
@@ -1386,7 +1386,7 @@ void G_CalculateBuildPoints( void )
           G_ChangeTeam(ent, PTE_NONE);
         }
 
-        if( g_suddenDeathMode.integer == SDMODE_SELECTIVE )
+        if( g_hungerGamesMode.integer == SDMODE_SELECTIVE )
         {
           for( i = 1, ent = g_entities + i; i < level.num_entities; i++, ent++ )
           {
@@ -1404,33 +1404,33 @@ void G_CalculateBuildPoints( void )
             }
           }
         }
-        level.suddenDeathHBuildPoints = localHTP;
-        level.suddenDeathABuildPoints = localATP;
-        level.suddenDeathBeginTime = level.time;
-        level.suddenDeath=qtrue;
-        trap_Cvar_Set( "g_suddenDeath", "1" );
+        level.hungerGamesHBuildPoints = localHTP;
+        level.hungerGamesABuildPoints = localATP;
+        level.hungerGamesBeginTime = level.time;
+        level.hungerGames=qtrue;
+        trap_Cvar_Set( "g_hungerGames", "1" );
 
-        level.suddenDeathWarning = TW_PASSED;
+        level.hungerGamesWarning = TW_PASSED;
       }
     }  
     else 
     {
        //warn about sudden death
-       if( ( G_TimeTilSuddenDeath( ) <= 60000 ) &&
-           (  level.suddenDeathWarning < TW_IMMINENT ) )
+       if( ( G_TimeTilHungerGames( ) <= 60000 ) &&
+           (  level.hungerGamesWarning < TW_IMMINENT ) )
        {
          trap_SendServerCommand( -1, va("cp \"The Hunger Games will start in %d seconds!\"", 
-               (int)(G_TimeTilSuddenDeath() / 1000 ) ) );
-         level.suddenDeathWarning = TW_IMMINENT;
+               (int)(G_TimeTilHungerGames() / 1000 ) ) );
+         level.hungerGamesWarning = TW_IMMINENT;
        }
     }
   }
   
   //set BP at each cycle
-  if( !g_cheats.integer && g_suddenDeath.integer )
+  if( !g_cheats.integer && g_hungerGames.integer )
   {
-    localHTP = level.suddenDeathHBuildPoints;
-    localATP = level.suddenDeathABuildPoints;
+    localHTP = level.hungerGamesHBuildPoints;
+    localATP = level.hungerGamesABuildPoints;
   }
   else
   {
@@ -1462,7 +1462,7 @@ void G_CalculateBuildPoints( void )
       if( buildable == BA_A_OVERMIND && ent->spawned && ent->health > 0 )
         level.overmindPresent = qtrue;
 
-      if( !g_suddenDeath.integer || BG_FindReplaceableTestForBuildable( buildable ) )
+      if( !g_hungerGames.integer || BG_FindReplaceableTestForBuildable( buildable ) )
       {
         if( BG_FindTeamForBuildable( buildable ) == BIT_HUMANS )
         {
@@ -1590,8 +1590,8 @@ void G_CalculateStages( void )
 */
   // Update stage every specified time
   // Normal stage update for aliens since they are not part of the game
-  if( g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 && level.suddenDeathBeginTime >= 0 &&
-    ( level.time - level.suddenDeathBeginTime ) >= ( hg_stage2AdvanceTime.integer * 60000 ) )
+  if( g_humanStage.integer == S1 && g_humanMaxStage.integer > S1 && level.hungerGamesBeginTime >= 0 &&
+    ( level.time - level.hungerGamesBeginTime ) >= ( hg_stage2AdvanceTime.integer * 60000 ) )
   {
     trap_Cvar_Set( "g_humanStage", va( "%d", S2 ) );
     level.humanStage2Time = level.time;
@@ -1599,8 +1599,8 @@ void G_CalculateStages( void )
     G_LogPrintf(va("Stage: H 2: Humans reached Stage 2 at time %d\n", (level.time - level.startTime) / 60000));
   }
 
-  if( g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 && level.suddenDeathBeginTime >= 0 &&
-    ( level.time - level.suddenDeathBeginTime ) >= ( hg_stage3AdvanceTime.integer * 60000 ) )
+  if( g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 && level.hungerGamesBeginTime >= 0 &&
+    ( level.time - level.hungerGamesBeginTime ) >= ( hg_stage3AdvanceTime.integer * 60000 ) )
   {
     trap_Cvar_Set( "g_humanStage", va( "%d", S3 ) );
     level.humanStage3Time = level.time;
@@ -2216,7 +2216,7 @@ void G_SendGameStat( pTeam_t team )
       level.averageNumHumanClients,
       map,
       level.time - level.startTime,
-      G_TimeTilSuddenDeath( ),
+      G_TimeTilHungerGames( ),
       g_alienStage.integer,
       level.alienStage2Time - level.startTime,
       level.alienStage3Time - level.startTime,
@@ -2578,14 +2578,14 @@ void CheckVote( void )
     }
 
 
-    if( !Q_stricmp( level.voteString, "suddendeath" ) )
+    if( !Q_stricmp( level.voteString, "hungergames" ) )
     {
-      level.suddenDeathBeginTime = level.time + ( 1000 * g_suddenDeathVoteDelay.integer ) - level.startTime;
+      level.hungerGamesBeginTime = level.time + ( 1000 * g_hungerGamesVoteDelay.integer ) - level.startTime;
 
       level.voteString[0] = '\0';
 
-      if( g_suddenDeathVoteDelay.integer )
-        trap_SendServerCommand( -1, va("cp \"Sudden Death will begin in %d seconds\n\"", g_suddenDeathVoteDelay.integer  ) );
+      if( g_hungerGamesVoteDelay.integer )
+        trap_SendServerCommand( -1, va("cp \"Sudden Death will begin in %d seconds\n\"", g_hungerGamesVoteDelay.integer  ) );
     }
 
     if( level.voteString[0] )
@@ -2852,10 +2852,10 @@ void CheckCvars( void )
     }
   }
 
-  if( g_suddenDeathTime.modificationCount != lastSDTimeModCount )
+  if( g_hungerGamesTime.modificationCount != lastSDTimeModCount )
   {
-    lastSDTimeModCount = g_suddenDeathTime.modificationCount;
-    level.suddenDeathBeginTime = g_suddenDeathTime.integer * 60000;
+    lastSDTimeModCount = g_hungerGamesTime.modificationCount;
+    level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
   }
 
   level.frameMsec = trap_Milliseconds( );

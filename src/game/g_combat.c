@@ -1334,7 +1334,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
       return;
 
     // HG invincibility
-    if( targ->s.eType != ET_BUILDABLE && !g_suddenDeath.integer )
+    if( targ->s.eType != ET_BUILDABLE && !g_hungerGames.integer )
       return;
 
     if( level.paused )

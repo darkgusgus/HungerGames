@@ -801,7 +801,7 @@ void Cmd_Team_f( gentity_t *ent )
       return;
     }
 
-    if( ( level.alienTeamLocked || g_suddenDeath.integer ) && !force )
+    if( ( level.alienTeamLocked || g_hungerGames.integer ) && !force )
     {
       trap_SendServerCommand( ent-g_entities,
         va( "print \"Alien team has been ^1LOCKED\n\"" ) );
@@ -831,7 +831,7 @@ void Cmd_Team_f( gentity_t *ent )
       return;
     }
 
-    if( ( level.humanTeamLocked || g_suddenDeath.integer ) && !force )
+    if( ( level.humanTeamLocked || g_hungerGames.integer ) && !force )
     {
       trap_SendServerCommand( ent-g_entities,
         va( "print \"Human team has been ^1LOCKED\n\"" ) );
@@ -854,7 +854,7 @@ void Cmd_Team_f( gentity_t *ent )
   }
   else if( !Q_stricmp( s, "auto" ) )
   {
-    if( g_suddenDeath.integer || ( level.humanTeamLocked && level.alienTeamLocked ) )
+    if( g_hungerGames.integer || ( level.humanTeamLocked && level.alienTeamLocked ) )
       team = PTE_NONE;
     else if( humans > aliens )
       team = PTE_ALIENS;
@@ -1805,33 +1805,33 @@ void Cmd_CallVote_f( gentity_t *ent )
       Com_sprintf( level.voteDisplayString,
           sizeof( level.voteDisplayString ), "[Poll] \'%s\'", arg2plus );
    }
-   else if( !Q_stricmp( arg1, "sudden_death" ) ||
-     !Q_stricmp( arg1, "suddendeath" ) )
+   else if( !Q_stricmp( arg1, "hunger_games" ) ||
+     !Q_stricmp( arg1, "hungergames" ) )
    {
-     if(!g_suddenDeathVotePercent.integer)
+     if(!g_hungerGamesVotePercent.integer)
      {
        trap_SendServerCommand( ent-g_entities, "print \"Sudden Death votes have been disabled\n\"" );
        return;
      } 
-     else if( g_suddenDeath.integer ) 
+     else if( g_hungerGames.integer ) 
      {
       trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Sudden Death has already begun\n\"") );
       return;
      }
-     else if( G_TimeTilSuddenDeath() <= g_suddenDeathVoteDelay.integer * 1000 )
+     else if( G_TimeTilHungerGames() <= g_hungerGamesVoteDelay.integer * 1000 )
      {
       trap_SendServerCommand( ent - g_entities, va( "print \"callvote: Sudden Death is already immenent\n\"") );
       return;
      }
     else 
      {
-       level.votePassThreshold = g_suddenDeathVotePercent.integer;
-       Com_sprintf( level.voteString, sizeof( level.voteString ), "suddendeath" );
+       level.votePassThreshold = g_hungerGamesVotePercent.integer;
+       Com_sprintf( level.voteString, sizeof( level.voteString ), "hungergames" );
        Com_sprintf( level.voteDisplayString,
            sizeof( level.voteDisplayString ), "Begin sudden death" );
 
-       if( g_suddenDeathVoteDelay.integer )
-         Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( " in %d seconds", g_suddenDeathVoteDelay.integer ) );
+       if( g_hungerGamesVoteDelay.integer )
+         Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( " in %d seconds", g_hungerGamesVoteDelay.integer ) );
 
      }
    }
@@ -1959,7 +1959,7 @@ void Cmd_CallVote_f( gentity_t *ent )
     {
       trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
       trap_SendServerCommand( ent-g_entities, "print \"Valid vote commands are: "
-        "map, map_restart, draw, extend, nextmap, kick, spec, mute, unmute, poll, and sudden_death\n" );
+        "map, map_restart, draw, extend, nextmap, kick, spec, mute, unmute, poll, and hunger_games\n" );
       if( customVoteKeys[ 0 ] != '\0' )
         trap_SendServerCommand( ent-g_entities,
           va( "print \"Additional custom vote commands: %s\n\"", customVoteKeys ) );
@@ -3007,13 +3007,13 @@ void Cmd_Destroy_f( gentity_t *ent )
         return;
 
       // Don't allow destruction of buildables that cannot be rebuilt
-      if(!g_cheats.integer && g_suddenDeath.integer && traceEnt->health > 0 &&
-          ( ( g_suddenDeathMode.integer == SDMODE_SELECTIVE &&
+      if(!g_cheats.integer && g_hungerGames.integer && traceEnt->health > 0 &&
+          ( ( g_hungerGamesMode.integer == SDMODE_SELECTIVE &&
               !BG_FindReplaceableTestForBuildable( traceEnt->s.modelindex ) ) ||
-            ( g_suddenDeathMode.integer == SDMODE_BP &&
+            ( g_hungerGamesMode.integer == SDMODE_BP &&
               BG_FindBuildPointsForBuildable( traceEnt->s.modelindex ) ) ||
-            g_suddenDeathMode.integer == SDMODE_NO_BUILD  ||
-            g_suddenDeathMode.integer == SDMODE_NO_DECON ) )
+            g_hungerGamesMode.integer == SDMODE_NO_BUILD  ||
+            g_hungerGamesMode.integer == SDMODE_NO_DECON ) )
       {
         trap_SendServerCommand( ent-g_entities,
           "print \"During Sudden Death you can only decon buildings that "
@@ -3147,13 +3147,13 @@ void Cmd_Mark_f( gentity_t *ent )
       }
 
       // Don't allow marking of buildables that cannot be rebuilt
-      if(!g_cheats.integer && g_suddenDeath.integer && traceEnt->health > 0 &&
-          ( ( g_suddenDeathMode.integer == SDMODE_SELECTIVE &&
+      if(!g_cheats.integer && g_hungerGames.integer && traceEnt->health > 0 &&
+          ( ( g_hungerGamesMode.integer == SDMODE_SELECTIVE &&
               !BG_FindReplaceableTestForBuildable( traceEnt->s.modelindex ) ) ||
-            ( g_suddenDeathMode.integer == SDMODE_BP &&
+            ( g_hungerGamesMode.integer == SDMODE_BP &&
               BG_FindBuildPointsForBuildable( traceEnt->s.modelindex ) ) ||
-            g_suddenDeathMode.integer == SDMODE_NO_BUILD ||
-            g_suddenDeathMode.integer == SDMODE_NO_DECON ) )
+            g_hungerGamesMode.integer == SDMODE_NO_BUILD ||
+            g_hungerGamesMode.integer == SDMODE_NO_DECON ) )
       {
         trap_SendServerCommand( ent-g_entities,
           "print \"During Sudden Death you can only mark buildings that "
@@ -3685,9 +3685,9 @@ void Cmd_Build_f( gentity_t *ent )
   buildable = BG_FindBuildNumForName( s );
 
 
-  if( g_suddenDeath.integer && !g_cheats.integer )
+  if( g_hungerGames.integer && !g_cheats.integer )
   {
-    if( g_suddenDeathMode.integer == SDMODE_SELECTIVE )
+    if( g_hungerGamesMode.integer == SDMODE_SELECTIVE )
     {
       if( !BG_FindReplaceableTestForBuildable( buildable ) )
       {
@@ -3702,7 +3702,7 @@ void Cmd_Build_f( gentity_t *ent )
         return;
       }
     }
-    else if( g_suddenDeathMode.integer == SDMODE_NO_BUILD )
+    else if( g_hungerGamesMode.integer == SDMODE_NO_BUILD )
     {
       trap_SendServerCommand( ent-g_entities,
         "print \"Building is not allowed during Sudden Death\n\"" );
