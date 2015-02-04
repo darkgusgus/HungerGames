@@ -1074,8 +1074,7 @@ UIFILES_ = \
   ui/tremulous_alien_builder_hud.menu \
   ui/tremulous_alien_general_hud.menu \
   ui/tremulous_default_hud.menu \
-  ui/tremulous_human_hud.menu \
-  $(shell git diff --name-only cd4da82 ui)
+  ui/tremulous_human_hud.menu
 
 ui/infopanes.def: ui/infopanes.def.h
 	@echo "GCC $@"
