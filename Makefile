@@ -1059,6 +1059,7 @@ UIFILES_ = \
   ui/assets/human/buildstat/nopower.tga \
   ui/assets/human/buildstat.cfg \
   ui/drop.menu \
+  ui/infopanes.def \
   ui/ingame.menu \
   ui/ingame.txt \
   ui/ingame_game.menu \
@@ -1075,6 +1076,10 @@ UIFILES_ = \
   ui/tremulous_default_hud.menu \
   ui/tremulous_human_hud.menu \
   $(shell git diff --name-only cd4da82 ui)
+
+ui/infopanes.def: ui/infopanes.def.h
+	@echo "GCC $@"
+	@gcc -E $< | grep "^[^#].*" > $@
 
 $(B)/$(MODPATH)/zui.$(PK3EXT): $(UIFILES_)
 	@echo "ZIP $@"
