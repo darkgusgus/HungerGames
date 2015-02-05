@@ -167,7 +167,7 @@
       rect 30 85 256 20
       type 4
       style 0	
-      text "Sudden Death Time:"
+      text "Hunger Games Time:"
       cvar ui_serverinfo_sd
       maxPaintChars 12
       textalign ITEM_ALIGN_RIGHT
@@ -969,7 +969,7 @@
       rect 30 85 256 20
       type 4
       style 0	
-      text "Sudden Death Time:"
+      text "Hunger Games Time:"
       cvar ui_serverinfo_sd
       maxPaintChars 12
       textalign ITEM_ALIGN_RIGHT
@@ -1770,7 +1770,7 @@
       rect 30 85 256 20
       type 4
       style 0	
-      text "Sudden Death Time:"
+      text "Hunger Games Time:"
       cvar ui_serverinfo_sd
       maxPaintChars 12
       textalign ITEM_ALIGN_RIGHT
@@ -2571,7 +2571,7 @@
       rect 30 85 256 20
       type 4
       style 0	
-      text "Sudden Death Time:"
+      text "Hunger Games Time:"
       cvar ui_serverinfo_sd
       maxPaintChars 12
       textalign ITEM_ALIGN_RIGHT		
