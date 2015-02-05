@@ -819,6 +819,8 @@ typedef struct
   nbMarkers_t	    nbMarkers[ MAX_GENTITIES ];
 
   gclient_t         *lastHumanClient;
+  int               hungerGamesReadyTime;
+  qboolean          hungerGamesStarted;
 } level_locals_t;
 
 #define CMD_CHEAT         0x01
@@ -1492,6 +1494,7 @@ extern  vmCvar_t  g_aimbotAdvertBanReason;
 // Hunger Games CVars
 extern  vmCvar_t  hg_stage2AdvanceTime;
 extern  vmCvar_t  hg_stage3AdvanceTime;
+extern  vmCvar_t  hg_minPlayers;
 
 extern  vmCvar_t  g_tipTime;
 extern  vmCvar_t  g_tipFile;

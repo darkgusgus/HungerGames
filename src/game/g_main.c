@@ -237,6 +237,7 @@ vmCvar_t  g_aimbotAdvertBanReason;
 //Hunger Games CVars
 vmCvar_t  hg_stage2AdvanceTime;
 vmCvar_t  hg_stage3AdvanceTime;
+vmCvar_t  hg_minPlayers;
 
 vmCvar_t  g_tipTime;
 vmCvar_t  g_tipFile;
@@ -274,7 +275,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_timelimit, "timelimit", "45", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
   { &g_hungerGamesTime, "g_hungerGamesTime", "1", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
   { &g_hungerGamesMode, "g_hungerGamesMode", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-  { &g_hungerGames, "g_hungerGames", "0", CVAR_SERVERINFO | CVAR_NORESTART, 0, qtrue },
+  { &g_hungerGames, "g_hungerGames", "0", CVAR_SERVERINFO | CVAR_NORESTART, 0, qfalse },
 
   { &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO, 0, qfalse  },
 
@@ -464,6 +465,7 @@ static cvarTable_t   gameCvarTable[ ] =
   // Hunger Games CVars
   { &hg_stage2AdvanceTime, "hg_stage2AdvanceTime", "3", CVAR_ARCHIVE, 0, qfalse },
   { &hg_stage3AdvanceTime, "hg_stage3AdvanceTime", "5", CVAR_ARCHIVE, 0, qfalse },
+  { &hg_minPlayers, "hg_minPlayers", "2", CVAR_ARCHIVE, 0, qfalse },
 
   { &g_tipTime, "g_tipTime", "15", CVAR_ARCHIVE, 0, qfalse },
   { &g_tipFile, "g_tipFile", "info/tips.txt", CVAR_ARCHIVE, 0, qfalse },
@@ -753,8 +755,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
   memset( &level, 0, sizeof( level ) );
   level.time = levelTime;
   level.startTime = levelTime;
+  level.hungerGamesReadyTime =  levelTime;
+  level.hungerGamesStarted = qfalse;
   level.alienStage2Time = level.alienStage3Time =
-    level.humanStage2Time = level.humanStage3Time = level.startTime;
+    level.humanStage2Time = level.humanStage3Time = level.hungerGamesReadyTime;
 
   level.snd_fry = G_SoundIndex( "sound/misc/fry.wav" ); // FIXME standing in lava / slime
 
@@ -868,7 +872,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
   trap_Cvar_Set( "g_alienKills", 0 );
   trap_Cvar_Set( "g_humanKills", 0 );
   trap_Cvar_Set( "g_hungerGames", 0 );
-  level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
+  level.hungerGamesBeginTime = level.hungerGamesReadyTime + g_hungerGamesTime.integer * 60000;
 
   G_Printf( "-----------------------------------\n" );
 
@@ -1320,10 +1324,10 @@ G_TimeTilHungerGames
 */
 int G_TimeTilHungerGames( void )
 {
-  if( (!g_hungerGamesTime.integer && level.hungerGamesBeginTime==0 ) || level.hungerGamesBeginTime<0 )
-    return 999999999; // Always some time away
+  if( !level.hungerGamesStarted || (!g_hungerGamesTime.integer && level.hungerGamesBeginTime==0 ) || level.hungerGamesBeginTime<0 )
+    return INFINITE; // Always some time away
 
-  return ( ( level.hungerGamesBeginTime ) - ( level.time - level.startTime ) );
+  return ( ( level.hungerGamesBeginTime ) - ( level.time ) );
 }
 
 
@@ -1354,8 +1358,8 @@ void G_CalculateBuildPoints( void )
     level.hungerGames=qfalse;
     level.hungerGamesWarning=0;
     level.hungerGamesBeginTime = -1;
-    if((level.time - level.startTime) < (g_hungerGamesTime.integer * 60000 ) )
-      level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
+    if((level.time - level.hungerGamesReadyTime) < (g_hungerGamesTime.integer * 60000 ) )
+      level.hungerGamesBeginTime = level.hungerGamesReadyTime + g_hungerGamesTime.integer * 60000;
     else
       level.hungerGamesBeginTime = -1;
   }
@@ -1596,7 +1600,7 @@ void G_CalculateStages( void )
     trap_Cvar_Set( "g_humanStage", va( "%d", S2 ) );
     level.humanStage2Time = level.time;
     lastHumanStageModCount = g_humanStage.modificationCount;
-    G_LogPrintf(va("Stage: H 2: Humans reached Stage 2 at time %d\n", (level.time - level.startTime) / 60000));
+    G_LogPrintf(va("Stage: H 2: Humans reached Stage 2 at time %d\n", (level.time - level.hungerGamesReadyTime) / 60000));
   }
 
   if( g_humanStage.integer == S2 && g_humanMaxStage.integer > S2 && level.hungerGamesBeginTime >= 0 &&
@@ -1604,7 +1608,7 @@ void G_CalculateStages( void )
   {
     trap_Cvar_Set( "g_humanStage", va( "%d", S3 ) );
     level.humanStage3Time = level.time;
-    G_LogPrintf(va("Stage: H 3: Humans reached Stage 3 at time %d\n", (level.time - level.startTime) / 60000));
+    G_LogPrintf(va("Stage: H 3: Humans reached Stage 3 at time %d\n", (level.time - level.hungerGamesReadyTime) / 60000));
     lastHumanStageModCount = g_humanStage.modificationCount;
   }
  
@@ -2215,14 +2219,14 @@ void G_SendGameStat( pTeam_t team )
       level.averageNumAlienClients,
       level.averageNumHumanClients,
       map,
-      level.time - level.startTime,
+      level.time - level.hungerGamesReadyTime,
       G_TimeTilHungerGames( ),
       g_alienStage.integer,
-      level.alienStage2Time - level.startTime,
-      level.alienStage3Time - level.startTime,
+      level.alienStage2Time - level.hungerGamesReadyTime,
+      level.alienStage3Time - level.hungerGamesReadyTime,
       g_humanStage.integer,
-      level.humanStage2Time - level.startTime,
-      level.humanStage3Time - level.startTime,
+      level.humanStage2Time - level.hungerGamesReadyTime,
+      level.humanStage3Time - level.hungerGamesReadyTime,
       level.numConnectedClients );
 
   dataLength = strlen( data );
@@ -2489,7 +2493,7 @@ void CheckExitRules( void )
 
   if( g_timelimit.integer )
   {
-    if( level.time - level.startTime >= g_timelimit.integer * 60000 )
+    if( level.time - level.hungerGamesReadyTime >= g_timelimit.integer * 60000 )
     {
       level.lastWin = PTE_NONE;
       trap_SendServerCommand( -1, "print \"Timelimit hit\n\"" );
@@ -2498,13 +2502,13 @@ void CheckExitRules( void )
       G_admin_maplog_result( "t" );
       return;
     }
-    else if( level.time - level.startTime >= ( g_timelimit.integer - 5 ) * 60000 &&
+    else if( level.time - level.hungerGamesReadyTime >= ( g_timelimit.integer - 5 ) * 60000 &&
           level.timelimitWarning < TW_IMMINENT )
     {
       trap_SendServerCommand( -1, "cp \"5 minutes remaining!\"" );
       level.timelimitWarning = TW_IMMINENT;
     }
-    else if( level.time - level.startTime >= ( g_timelimit.integer - 1 ) * 60000 &&
+    else if( level.time - level.hungerGamesReadyTime >= ( g_timelimit.integer - 1 ) * 60000 &&
           level.timelimitWarning < TW_PASSED )
     {
       trap_SendServerCommand( -1, "cp \"1 minute remaining!\"" );
@@ -2518,7 +2522,7 @@ void CheckExitRules( void )
 
   //HG win
   if( level.uncondHumanWin ||
-      ( ( level.time > level.startTime + 1000 ) &&
+      ( ( level.time > level.hungerGamesReadyTime + 1000 ) &&
         ( level.numHumanSpawns == 0 ) &&
         ( level.numLiveHumanClients <= 1 ) ) )
   {
@@ -2580,7 +2584,9 @@ void CheckVote( void )
 
     if( !Q_stricmp( level.voteString, "hungergames" ) )
     {
-      level.hungerGamesBeginTime = level.time + ( 1000 * g_hungerGamesVoteDelay.integer ) - level.startTime;
+      level.hungerGamesStarted = qtrue;
+
+      level.hungerGamesBeginTime = level.time + ( 1000 * g_hungerGamesVoteDelay.integer ) - level.hungerGamesReadyTime;
 
       level.voteString[0] = '\0';
 
@@ -2855,7 +2861,7 @@ void CheckCvars( void )
   if( g_hungerGamesTime.modificationCount != lastSDTimeModCount )
   {
     lastSDTimeModCount = g_hungerGamesTime.modificationCount;
-    level.hungerGamesBeginTime = g_hungerGamesTime.integer * 60000;
+    level.hungerGamesBeginTime = level.hungerGamesReadyTime + g_hungerGamesTime.integer * 60000;
   }
 
   level.frameMsec = trap_Milliseconds( );
@@ -2932,11 +2938,25 @@ void G_RunFrame( int levelTime )
       trap_SendServerCommand( -1, "cp \"^3Game is paused.\"" );
 
     level.startTime += levelTime - level.time;
-    trap_SetConfigstring( CS_LEVEL_START_TIME, va( "%i", level.startTime ) );
+    level.hungerGamesReadyTime += levelTime - level.time;
+    trap_SetConfigstring( CS_LEVEL_START_TIME, va( "%i", level.hungerGamesReadyTime ) );
 
     if( levelTime - level.pauseTime > 3 * 60000 )
     {
       trap_SendConsoleCommand( EXEC_APPEND, "!unpause" );
+    }
+  }
+
+  if(!level.hungerGamesStarted)
+  {
+    level.hungerGamesReadyTime += levelTime - level.time;
+    trap_SetConfigstring( CS_LEVEL_START_TIME, va( "%i", level.hungerGamesReadyTime ) );
+    level.hungerGamesBeginTime = level.hungerGamesReadyTime + g_hungerGamesTime.integer * 60000;
+
+    if(level.numLiveHumanClients >= hg_minPlayers.integer)
+    {
+      level.hungerGamesStarted = qtrue;
+      trap_SendServerCommand( -1, va("cp \"Hunger Games will begin in %d seconds!\"", (int)(G_TimeTilHungerGames() / 1000)));
     }
   }
 
