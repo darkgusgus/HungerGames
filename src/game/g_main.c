@@ -242,12 +242,14 @@ vmCvar_t  hg_minPlayers;
 vmCvar_t  g_tipTime;
 vmCvar_t  g_tipFile;
 vmCvar_t  g_tipPrepend;
+vmCvar_t  g_tipRandomize;
 
 
 // Hunger Games
 // Keep these local since they won't be used elsewhere?
 // Another idea is to store in level_locals_t
 int       lastTipTime;
+int       tipIndex;
 char      tipCache[HG_MAX_TIP_COUNT][HG_MAX_TIP_LENGTH + 1];
 int       tipCacheSize;
 
@@ -469,6 +471,7 @@ static cvarTable_t   gameCvarTable[ ] =
 
   { &g_tipTime, "g_tipTime", "15", CVAR_ARCHIVE, 0, qfalse },
   { &g_tipFile, "g_tipFile", "info/tips.txt", CVAR_ARCHIVE, 0, qfalse },
+  { &g_tipRandomize, "g_tipRandomize", "1", CVAR_ARCHIVE, 0, qfalse },
   { &g_tipPrepend, "g_tipPrepend", "^3Tip: ", CVAR_ARCHIVE, 0, qfalse }
 };
 
@@ -3129,6 +3132,7 @@ void G_InitTips( void )
   char message[ MAX_STRING_CHARS ], *cr;
 
   lastTipTime = level.startTime;
+  tipIndex = 0;
   tipCacheSize = 0;
 
   // Most of this pulled from !info
@@ -3206,11 +3210,21 @@ void G_ShowTips( void )
 {
   static int seed = 69;
   int randNum;
+
   if(tipCacheSize <= 0 || (level.time - lastTipTime) < g_tipTime.integer * 1000)
     return;
-  
-  randNum = Q_rand(&seed);
-
-  trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[abs(randNum % tipCacheSize)] ) ); // not exactly but other places use it
+    
+  if(g_tipRandomize.integer)
+  {
+    randNum = Q_rand(&seed);
+    trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[abs(randNum % tipCacheSize)] ) ); // not exactly random but other places use it
+  }
+  else
+  {
+    if(tipIndex >= tipCacheSize)
+      tipIndex = 0;
+    trap_SendServerCommand( -1, va( "print \"%s^7%s\n\"", g_tipPrepend.string, tipCache[tipIndex] ) );
+    tipIndex++;
+  }
   lastTipTime = level.time;
 }
