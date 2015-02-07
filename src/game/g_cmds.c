@@ -764,7 +764,7 @@ void Cmd_Team_f( gentity_t *ent )
 
   if( !strlen( s ) )
   {
-    trap_SendServerCommand( ent-g_entities, va("print \"team: %i\n\"",
+    trap_SendServerCommand( ent - g_entities, va("print \"team: %i\n\"",
       oldteam ) );
     return;
   }

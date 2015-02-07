@@ -1697,7 +1697,6 @@ void CalculateRanks( void )
   level.numHumanClients = 0;
   level.numLiveAlienClients = 0;
   level.numLiveHumanClients = 0;
-  level.lastHumanClient = NULL;
 
   for( i = 0; i < level.maxclients; i++ )
   {
@@ -1727,10 +1726,8 @@ void CalculateRanks( void )
         else if( level.clients[ i ].pers.teamSelection == PTE_HUMANS )
         {
           level.numHumanClients++;
-          if( level.clients[ i ].sess.sessionTeam != TEAM_SPECTATOR ) {
+          if( level.clients[ i ].sess.sessionTeam != TEAM_SPECTATOR )
             level.numLiveHumanClients++;
-            level.lastHumanClient = &level.clients[ i ];
-          }
         }
       }
     }
@@ -2472,6 +2469,10 @@ can see the last frag.
 */
 void CheckExitRules( void )
 {
+  int i;
+  gclient_t *lastHuman;
+
+  lastHuman = NULL;
   // if at the intermission, wait for all non-bots to
   // signal ready, then go to next level
   if( level.intermissiontime )
@@ -2526,7 +2527,17 @@ void CheckExitRules( void )
         ( level.numHumanSpawns == 0 ) &&
         ( level.numLiveHumanClients <= 1 ) ) )
   {
-    if( level.lastHumanClient == NULL )
+    // find last client
+    for( i = 0; i < level.maxclients; i++ )
+      if ( level.clients[ i ].pers.connected == CON_CONNECTED && 
+        level.clients[ i ].pers.teamSelection == PTE_HUMANS && 
+        level.clients[ i ].sess.sessionTeam != TEAM_SPECTATOR )
+      {
+        lastHuman = &level.clients[ i ];
+        break;
+      }
+
+    if( lastHuman == NULL )
     {
       level.lastWin = PTE_NONE;
       trap_SendServerCommand( -1, "print \"No winner\n\"" );
@@ -2537,10 +2548,10 @@ void CheckExitRules( void )
     else
     {  
       level.lastWin = PTE_HUMANS;
-      trap_SendServerCommand( -1, va("print \"%s^7 wins\n\"", level.lastHumanClient->pers.netname) );
-      trap_SendServerCommand( -1, va("cp \"%s^7 wins\n\"", level.lastHumanClient->pers.netname) );
-      trap_SetConfigstring( CS_WINNER, va("%s^7 wins", level.lastHumanClient->pers.netname) );
-      LogExit( va("%s^7 wins", level.lastHumanClient->pers.netname) );
+      trap_SendServerCommand( -1, va("print \"%s^7 wins\n\"", lastHuman->pers.netname) );
+      trap_SendServerCommand( -1, va("cp \"%s^7 wins\n\"", lastHuman->pers.netname) );
+      trap_SetConfigstring( CS_WINNER, va("%s^7 wins", lastHuman->pers.netname) );
+      LogExit( va("%s^7 wins", lastHuman->pers.netname) );
       G_admin_maplog_result( "h" );
     }
   }

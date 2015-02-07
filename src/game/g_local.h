@@ -818,7 +818,6 @@ typedef struct
   
   nbMarkers_t	    nbMarkers[ MAX_GENTITIES ];
 
-  gclient_t         *lastHumanClient;
   int               hungerGamesReadyTime;
   qboolean          hungerGamesStarted;
 } level_locals_t;
