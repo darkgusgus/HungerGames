@@ -1498,6 +1498,7 @@ extern  vmCvar_t  hg_minPlayers;
 extern  vmCvar_t  g_tipTime;
 extern  vmCvar_t  g_tipFile;
 extern  vmCvar_t  g_tipPrepend;
+extern  vmCvar_t  g_tipRandomize;
 
 extern  char      tipCache[HG_MAX_TIP_COUNT][HG_MAX_TIP_LENGTH + 1];
 extern  int       tipCacheSize;
