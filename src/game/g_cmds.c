@@ -260,9 +260,9 @@ void ScoreboardMessage( gentity_t *ent )
       ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
 
     //If (loop) client is a spectator, they have nothing, so indicate such. 
-    //Only send the client requesting the scoreboard the weapon/upgrades information for members of their team. If they are not on a team, send it all.
+    //Send the client requesting the scoreboard the weapon/upgrades if they are either spectators or aliens.
     if( cl->sess.sessionTeam != TEAM_SPECTATOR && 
-      ( cl->pers.teamSelection != ent->client->pers.teamSelection || ent->client->ps.pm_type == PM_SPECTATOR ) )
+      ( ent->client->pers.teamSelection == PTE_NONE || ent->client->pers.teamSelection == PTE_ALIENS ) )
     {
       weapon = cl->ps.weapon;
 
@@ -284,6 +284,9 @@ void ScoreboardMessage( gentity_t *ent )
       weapon = WP_NONE;
       upgrade = UP_NONE;
     }
+
+    if ( cl->pers.teamSelection == PTE_HUMANS && cl->ps.pm_type == PM_SPECTATOR )
+      weapon = WP_DEAD;
 
     Com_sprintf( entry, sizeof( entry ),
       " %d %d %d %d %d %d", level.sortedClients[ i ], cl->pers.score, ping, 

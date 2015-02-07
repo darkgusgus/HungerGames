@@ -375,6 +375,8 @@ typedef enum
   WP_HBUILD,
   //ok?
 
+  WP_DEAD,
+
   WP_NUM_WEAPONS
 } weapon_t;
 

@@ -796,6 +796,7 @@ static void CG_RegisterGraphics( void )
     cgs.media.buildWeaponTimerPie[ i ] = trap_R_RegisterShader( buildWeaponTimerPieShaders[ i ] );
 
   cgs.media.upgradeClassIconShader    = trap_R_RegisterShader( "icons/icona_upgrade.tga" );
+  cgs.media.deathIconShader           = trap_R_RegisterShader( "icons/icon_death.tga" );
 
   cgs.media.balloonShader             = trap_R_RegisterShader( "gfx/sprites/chatballoon" );
 
@@ -1476,8 +1477,7 @@ static const char *CG_FeederItemText( float feederID, int index, int column, qha
   if( ( atoi( CG_ConfigString( CS_CLIENTS_READY ) ) & ( 1 << sp->client ) ) &&
       cg.intermissionStarted )
     showIcons = qfalse;
-  else if( cg.snap->ps.pm_type == PM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW ||
-    team == cg.snap->ps.stats[ STAT_PTEAM ] || cg.intermissionStarted )
+  else
     showIcons = qtrue;
 
   if( info && info->infoValid )
@@ -1487,7 +1487,9 @@ static const char *CG_FeederItemText( float feederID, int index, int column, qha
       case 0:
         if( showIcons )
         {
-          if( sp->weapon != WP_NONE )
+          if( sp->weapon == WP_DEAD )
+            *handle = cgs.media.deathIconShader;
+          else if( sp->weapon != WP_NONE )
             *handle = cg_weapons[ sp->weapon ].weaponIcon;
         }
         break;

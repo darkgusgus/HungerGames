@@ -3746,6 +3746,31 @@ weaponAttributes_t bg_weapons[ ] =
     qfalse,               //qboolean  longRanged;
     0,                    //int       buildDelay;
     WUT_HUMANS            //WUTeam_t  team;
+  },
+  {
+    WP_DEAD,              //int       weaponNum;
+    0,                    //int       price;
+    ( 1 << S1 )|( 1 << S2 )|( 1 << S3 ), //int  stages
+    SLOT_WEAPON,          //int       slots;
+    "dead",               //char      *weaponName;
+    "Dead human weapon",  //char      *weaponHumanName;
+    0,                    //int       maxAmmo;
+    0,                    //int       maxClips;
+    qtrue,                //int       infiniteAmmo;
+    qfalse,               //int       usesEnergy;
+    0,                    //int       repeatRate1;
+    0,                    //int       repeatRate2;
+    0,                    //int       repeatRate3;
+    0,                    //int       reloadTime;
+    0.0f,                 //float     knockbackScale;
+    qfalse,               //qboolean  hasAltMode;
+    qfalse,               //qboolean  hasThirdMode;
+    qfalse,               //qboolean  canZoom;
+    90.0f,                //float     zoomFov;
+    qfalse,               //qboolean  purchasable;
+    qfalse,               //qboolean  longRanged;
+    0,                    //int       buildDelay;
+    WUT_HUMANS            //WUTeam_t  team;
   }
 };
 

@@ -1044,6 +1044,7 @@ dist:
 #############################################################################
 
 UIFILES_ = \
+  icons/icon_death.tga \
   ui/assets/ \
   ui/assets/alien/ \
   ui/assets/alien/buildstat/ \
