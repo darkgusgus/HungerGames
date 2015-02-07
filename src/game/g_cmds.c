@@ -2778,12 +2778,6 @@ void Cmd_Class_f( gentity_t *ent )
         return;
       }
 
-      if( !level.overmindPresent )
-      {
-        G_TriggerMenu( clientNum, MN_A_NOOVMND_EVOLVE );
-        return;
-      }
-
       // denyweapons
       if( newClass >= PCL_ALIEN_LEVEL1 && newClass <= PCL_ALIEN_LEVEL4 &&
         ent->client->pers.denyAlienClasses & ( 1 << newClass ) )

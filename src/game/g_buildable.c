@@ -3257,20 +3257,6 @@ itemBuildError_t G_CanBuild( gentity_t *ent, buildable_t buildable, int distance
         contents & CONTENTS_NOALIENBUILD || contents & CONTENTS_NOBUILD )
       reason = IBE_PERMISSION;
 
-    //look for an Overmind
-    for ( i = 1, tempent = g_entities + i; i < level.num_entities; i++, tempent++ )
-    {
-      if( tempent->s.eType != ET_BUILDABLE )
-        continue;
-      if( tempent->s.modelindex == BA_A_OVERMIND && tempent->spawned &&
-        tempent->health > 0 )
-        break;
-    }
-
-    //if none found...
-    if( i >= level.num_entities && buildable != BA_A_OVERMIND )
-      reason = IBE_NOOVERMIND;
-
     //can we only have one of these?
     if( BG_FindUniqueTestForBuildable( buildable ) )
     {
