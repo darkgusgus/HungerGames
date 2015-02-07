@@ -837,7 +837,8 @@ void SpawnCorpse( gentity_t *ent )
   trap_LinkEntity( body );
 
   // HG Death
-  G_ChangeTeam( ent, PTE_NONE );
+  // No longer needed -- Foe
+  // G_ChangeTeam( ent, PTE_NONE );
 }
 
 //======================================================================
