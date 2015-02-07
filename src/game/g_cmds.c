@@ -262,7 +262,7 @@ void ScoreboardMessage( gentity_t *ent )
     //If (loop) client is a spectator, they have nothing, so indicate such. 
     //Only send the client requesting the scoreboard the weapon/upgrades information for members of their team. If they are not on a team, send it all.
     if( cl->sess.sessionTeam != TEAM_SPECTATOR && 
-      (ent->client->pers.teamSelection == PTE_NONE || cl->pers.teamSelection == ent->client->pers.teamSelection ) )
+      ( cl->pers.teamSelection != ent->client->pers.teamSelection || ent->client->ps.pm_type == PM_SPECTATOR ) )
     {
       weapon = cl->ps.weapon;
 
@@ -666,7 +666,7 @@ void G_ChangeTeam( gentity_t *ent, pTeam_t newTeam )
   // Undo that in this case, or else people can freespec while in the spawn queue on their new team
   if( newTeam != PTE_NONE )
   {
-    ent->client->sess.spectatorState = SPECTATOR_LOCKED;
+    ent->client->sess.spectatorState = SPECTATOR_FREE;
   }
   
   
