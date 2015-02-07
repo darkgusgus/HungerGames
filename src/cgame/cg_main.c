@@ -1487,9 +1487,7 @@ static const char *CG_FeederItemText( float feederID, int index, int column, qha
       case 0:
         if( showIcons )
         {
-          if( sp->weapon == WP_DEAD )
-            *handle = cgs.media.deathIconShader;
-          else if( sp->weapon != WP_NONE )
+          if( sp->weapon != WP_NONE )
             *handle = cg_weapons[ sp->weapon ].weaponIcon;
         }
         break;

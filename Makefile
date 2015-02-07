@@ -1044,7 +1044,12 @@ dist:
 #############################################################################
 
 UIFILES_ = \
+  icons/ \
   icons/icon_death.tga \
+  models/ \
+  models/weapons/ \
+  models/weapons/dead/ \
+  models/weapons/dead/weapon.cfg \
   ui/assets/ \
   ui/assets/alien/ \
   ui/assets/alien/buildstat/ \
