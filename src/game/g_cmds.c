@@ -285,7 +285,8 @@ void ScoreboardMessage( gentity_t *ent )
       upgrade = UP_NONE;
     }
 
-    if ( cl->pers.teamSelection == PTE_HUMANS && cl->ps.pm_type == PM_SPECTATOR )
+    if ( cl->pers.teamSelection == PTE_HUMANS &&
+       ( cl->ps.pm_type == PM_SPECTATOR || cl->ps.pm_flags & PMF_FOLLOW ) )
       weapon = WP_DEAD;
 
     Com_sprintf( entry, sizeof( entry ),
