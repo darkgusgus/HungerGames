@@ -261,8 +261,8 @@ void ScoreboardMessage( gentity_t *ent )
 
     //If (loop) client is a spectator, they have nothing, so indicate such. 
     //Send the client requesting the scoreboard the weapon/upgrades if they are either spectators or aliens.
-    if( cl->sess.sessionTeam != TEAM_SPECTATOR && 
-      ( ent->client->pers.teamSelection == PTE_NONE || ent->client->pers.teamSelection == PTE_ALIENS ) )
+    if( cl->sess.sessionTeam != TEAM_SPECTATOR &&
+      ( cl->pers.teamSelection != ent->client->pers.teamSelection || ent->client->ps.pm_type == PM_SPECTATOR ) ) 
     {
       weapon = cl->ps.weapon;
 

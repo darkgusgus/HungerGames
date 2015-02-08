@@ -796,7 +796,6 @@ static void CG_RegisterGraphics( void )
     cgs.media.buildWeaponTimerPie[ i ] = trap_R_RegisterShader( buildWeaponTimerPieShaders[ i ] );
 
   cgs.media.upgradeClassIconShader    = trap_R_RegisterShader( "icons/icona_upgrade.tga" );
-  cgs.media.deathIconShader           = trap_R_RegisterShader( "icons/icon_death.tga" );
 
   cgs.media.balloonShader             = trap_R_RegisterShader( "gfx/sprites/chatballoon" );
 
