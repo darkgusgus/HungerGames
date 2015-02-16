@@ -2,8 +2,7 @@ makefile.local
 build/
 src/tools/asm/q3asm
 src/tools/asm/q3asm.exe
-src/tools/lcc/build-linux-x86
-src/tools/lcc/build-mingw32-x86
+src/tools/lcc/build-*
 src/tools/q3asm
 src/tools/q3asm.exe
 src/tools/q3cpp
